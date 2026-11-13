@@ -1,0 +1,160 @@
+<!--
+==================== 티스토리 발행 안내 ====================
+[글 제목] 파이썬으로 여러 엑셀 파일을 하나로 합치기 (pandas, 5분 완성)
+[태그] 파이썬, 엑셀, pandas, 엑셀합치기, 파이썬엑셀, 업무자동화, openpyxl, read_excel, concat
+[검색 설명] 월별 매출처럼 여러 개로 나뉜 엑셀 파일을 파이썬 pandas로 한 번에 하나의 파일로 합치는 방법을 코드와 실행 결과로 설명합니다.
+
+[사용 방법]
+1. 티스토리 글쓰기 > 에디터를 "HTML" 모드로 바꾼 뒤, 이 주석 아래부터 마지막 줄까지 전부 붙여넣기
+   (글 제목은 티스토리 제목 칸에 위 [글 제목]을 따로 입력)
+2. src="images/..." 이미지는 로컬 파일 경로이므로 발행되지 않음.
+   → "기본모드"로 전환해 각 <이미지 자리>에 images 폴더의 같은 번호 파일을 업로드하고,
+     대표이미지는 01 또는 05번 사용 권장
+3. 이미지 순서: 05 만화 → 06 실사 → 01 흐름도 → 02 폴더구조 → 03 결과표 → 04 차트
+==========================================================
+-->
+
+<div style="font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; line-height:1.8; font-size:17px;">
+
+<p style="color:#777; font-size:14px;">작성일 2026.11.13 · 난이도 ★☆☆ · 준비물: Python, pandas, openpyxl</p>
+
+<p style="text-align:center;"><img src="images/05-복붙지옥-만화.png" alt="엑셀 파일 수십 개를 복사 붙여넣기 하다 지친 직장인 만화" style="max-width:100%; height:auto; border-radius:8px;"></p>
+<p style="text-align:center; font-size:14px; color:#666;">월말마다 반복되는 "복사 → 붙여넣기 → 복사 → 붙여넣기…"</p>
+
+<p>매달 만들어지는 월별 매출 파일, 지점마다 따로 받는 보고서 파일… 이런 엑셀 파일을 <b>하나로 합쳐야 할 때</b>가 있습니다. 파일이 3개면 손으로 해도 되지만, 12개, 50개가 되면 복사·붙여넣기만으로 하루가 지나갑니다. 게다가 한 번 실수하면 어디서 빠졌는지 찾기도 어렵습니다.</p>
+<p>이번 글에서는 파이썬 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">pandas</code>로 <b>폴더 안의 엑셀 파일을 전부 읽어 하나의 파일로 합치는 방법</b>을 20줄도 안 되는 코드로 알아보겠습니다.</p>
+
+<p style="text-align:center;"><img src="images/06-업무자동화-실사.png" alt="노트북으로 엑셀 데이터를 정리하는 사무실 책상 실사 이미지" style="max-width:100%; height:auto; border-radius:8px;"></p>
+<p style="text-align:center; font-size:14px; color:#666;">반복 업무는 코드에게 맡기고 우리는 결과를 분석하는 데 시간을 쓰자</p>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">1. 전체 흐름 한눈에 보기</h2>
+<p>동작 순서는 단순합니다. 폴더에서 엑셀 파일 목록을 찾고, 하나씩 읽어서 리스트에 담은 뒤, 세로로 이어 붙여 저장합니다.</p>
+<p style="text-align:center;"><img src="images/01-흐름도.png" alt="엑셀 파일 합치기 흐름도: 파일 목록 찾기, 읽기, 합치기, 저장" style="max-width:100%; height:auto; border-radius:8px;"></p>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">2. 준비하기</h2>
+<h3 style="font-size:18px; margin-top:28px;">2-1. 라이브러리 설치</h3>
+<p>엑셀을 읽고 쓰려면 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">pandas</code>와 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">openpyxl</code>이 필요합니다. 명령 프롬프트(터미널)에서 설치합니다.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>pip install pandas openpyxl</code></pre>
+
+<h3 style="font-size:18px; margin-top:28px;">2-2. 폴더 구조</h3>
+<p>예제에서는 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">sales</code> 폴더에 1~3월 매출 파일 3개가 들어 있다고 가정합니다. 세 파일 모두 <b>열 구성이 같습니다</b>(날짜, 지점, 상품, 수량, 금액).</p>
+<p style="text-align:center;"><img src="images/02-폴더구조.png" alt="작업 폴더 구조: merge.py, sales 폴더와 월별 매출 엑셀 3개" style="max-width:100%; height:auto; border-radius:8px;"></p>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">3. 전체 코드</h2>
+<p><code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">merge.py</code>라는 이름으로 저장하세요.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>import glob
+import os
+import pandas as pd
+
+folder = "sales"                                    # 엑셀 파일이 들어 있는 폴더
+files = sorted(glob.glob(os.path.join(folder, "*.xlsx")))
+
+if not files:
+    raise SystemExit("합칠 엑셀 파일이 없습니다.")
+
+frames = []
+for path in files:
+    df = pd.read_excel(path)                        # 파일 하나 읽기
+    df["파일명"] = os.path.basename(path)           # 어느 파일의 데이터인지 표시
+    frames.append(df)
+    print(f"{os.path.basename(path)} : {len(df)}행")
+
+merged = pd.concat(frames, ignore_index=True)       # 세로로 이어 붙이기
+merged.to_excel("합친결과.xlsx", index=False)
+print(f"\n총 {len(files)}개 파일, {len(merged)}행을 합쳤습니다.")</code></pre>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">4. 코드 설명</h2>
+<table style="border-collapse:collapse; width:100%; font-size:15px;">
+  <tr>
+    <th style="border:1px solid #d0d7e2; padding:8px 10px; background:#2f6fdb; color:#fff; width:36%;">코드</th>
+    <th style="border:1px solid #d0d7e2; padding:8px 10px; background:#2f6fdb; color:#fff;">설명</th>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>glob.glob(...)</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>sales</code> 폴더에서 <code>.xlsx</code>로 끝나는 파일 경로를 모두 찾습니다.</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>sorted(...)</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;">파일 순서를 이름순(1월 → 2월 → 3월)으로 맞춥니다. 안 쓰면 순서가 보장되지 않습니다.</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>pd.read_excel(path)</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;">엑셀 파일 하나를 표(DataFrame)로 읽습니다.</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>df["파일명"] = ...</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;">합친 뒤에도 원본을 알 수 있도록 <b>출처 열</b>을 추가합니다. 데이터 검증에 큰 도움이 됩니다.</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>pd.concat(frames, ignore_index=True)</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;">표들을 세로로 이어 붙이고, 행 번호를 0부터 새로 매깁니다.</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;"><code>to_excel(..., index=False)</code></td>
+    <td style="border:1px solid #d0d7e2; padding:8px 10px;">결과를 엑셀로 저장합니다. <code>index=False</code>는 불필요한 행 번호 열을 빼줍니다.</td>
+  </tr>
+</table>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">5. 실행 결과</h2>
+<p>터미널에서 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">merge.py</code>가 있는 폴더로 이동한 뒤 실행합니다.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>python merge.py</code></pre>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>매출_2026-01.xlsx : 4행
+매출_2026-02.xlsx : 4행
+매출_2026-03.xlsx : 4행
+
+총 3개 파일, 12행을 합쳤습니다.</code></pre>
+<p>4행씩 3개 파일이 12행 하나로 합쳐졌습니다. 생성된 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">합친결과.xlsx</code>를 열어보면 아래와 같습니다. (보기 좋도록 파일별로 색을 구분해 두었습니다.)</p>
+<p style="text-align:center;"><img src="images/03-결과표.png" alt="합쳐진 엑셀 결과 표 12행" style="max-width:100%; height:auto; border-radius:8px;"></p>
+
+<div style="background:#eaf6ee; color:#222; border-left:5px solid #2e9e5b; padding:12px 16px; margin:20px 0; border-radius:4px;">
+  <b>TIP</b> 합치기 전후의 행 수를 꼭 비교하세요. 개별 파일의 행 합계와 최종 행 수가 같다면 빠진 데이터가 없다는 뜻입니다.
+</div>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">6. 합친 데이터로 바로 분석해보기</h2>
+<p>한 번 합쳐 두면 분석은 쉬워집니다. 월별·지점별 매출을 집계해 누적 막대그래프로 그려 보겠습니다. 위 코드의 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">merged</code> 뒤에 이어서 쓰면 됩니다.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>import matplotlib.pyplot as plt
+
+plt.rcParams["font.family"] = "Malgun Gothic"        # 한글 폰트 (Windows)
+
+merged["월"] = pd.to_datetime(merged["날짜"]).dt.month.astype(str) + "월"
+pv = merged.pivot_table(index="월", columns="지점", values="금액", aggfunc="sum")
+
+(pv / 10000).plot(kind="bar", stacked=True)
+plt.ylabel("매출 (만원)")
+plt.show()</code></pre>
+<p>필요한 라이브러리는 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">pip install matplotlib</code>으로 설치합니다.</p>
+<p style="text-align:center;"><img src="images/04-월별매출차트.png" alt="월별·지점별 매출 누적 막대그래프" style="max-width:100%; height:auto; border-radius:8px;"></p>
+<p>그래프를 보니 2월은 매출이 가장 낮고, 3월은 서울 지점이 크게 늘었다는 것을 바로 알 수 있습니다. 파일 3개를 눈으로 비교했다면 놓쳤을 내용입니다.</p>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">7. 자주 겪는 문제와 해결</h2>
+<h3 style="font-size:18px; margin-top:28px;">7-1. 열 이름이 파일마다 다를 때</h3>
+<p><code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">concat</code>은 열 이름을 기준으로 합칩니다. 어떤 파일은 "금액", 다른 파일은 "매출액"이라면 빈 칸(NaN)이 가득한 열이 생깁니다. 합치기 전에 이름을 통일하세요.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>df = pd.read_excel(path)
+df = df.rename(columns={"매출액": "금액"})</code></pre>
+
+<h3 style="font-size:18px; margin-top:28px;">7-2. .xls 파일이 섞여 있을 때</h3>
+<p>예전 형식인 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">.xls</code>는 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">openpyxl</code>이 읽지 못합니다. <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">pip install xlrd</code>를 설치하거나, 엑셀에서 <code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">.xlsx</code>로 다시 저장한 뒤 사용하세요.</p>
+
+<h3 style="font-size:18px; margin-top:28px;">7-3. 시트가 여러 개인 파일을 모두 합치고 싶을 때</h3>
+<p><code style="background:#eef2fb; color:#1d4fb3; padding:2px 6px; border-radius:4px;">sheet_name=None</code>을 주면 모든 시트를 딕셔너리로 읽어옵니다.</p>
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>sheets = pd.read_excel(path, sheet_name=None)       # {"시트이름": DataFrame, ...}
+for name, df in sheets.items():
+    df["시트명"] = name
+    frames.append(df)</code></pre>
+
+<div style="background:#fff3e5; color:#222; border-left:5px solid #f08a24; padding:12px 16px; margin:20px 0; border-radius:4px;">
+  <b>주의</b> 엑셀에서 합치려는 파일을 열어 둔 상태에서 실행하면 오류가 날 수 있습니다. 또한 결과 파일(<code>합친결과.xlsx</code>)이 읽는 폴더 안에 있으면 다음 실행 때 결과가 다시 합쳐지니, 읽는 폴더와 저장 위치를 분리하세요. 이 예제에서는 결과를 <code>sales</code> 폴더 밖에 저장하므로 안전합니다.
+</div>
+
+<h2 style="font-size:22px; margin-top:44px; padding-bottom:6px; border-bottom:3px solid #2f6fdb;">8. 정리</h2>
+<ul>
+  <li><code>glob</code>으로 폴더의 엑셀 파일 목록을 가져온다.</li>
+  <li><code>read_excel</code>로 하나씩 읽고, 출처 열(<code>파일명</code>)을 붙여 둔다.</li>
+  <li><code>concat</code>으로 세로로 합치고 <code>to_excel</code>로 저장한다.</li>
+  <li>합친 뒤 행 수를 확인하고, 열 이름이 서로 같은지 점검한다.</li>
+</ul>
+<p>다음 글에서는 합쳐진 엑셀에 <b>조건에 따라 서식(배경색)을 자동으로 입히는 방법</b>을 다뤄 보겠습니다. 엑셀 파일을 만들고 저장하는 기본 방법이 궁금하다면 이전 글 <a href="https://coding-guide.tistory.com/22">파이썬으로 텍스트 및 엑셀 파일 불러오기</a>도 참고해 주세요.</p>
+
+<p style="color:#777; font-size:14px;">테스트 환경: Python 3.14, pandas 3.1, openpyxl 3.1, Windows 11</p>
+
+</div>
