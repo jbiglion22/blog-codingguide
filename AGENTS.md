@@ -100,6 +100,7 @@
 - 예제 코드 실행과 이미지 제작에 Python과 `pandas`, `openpyxl`, `matplotlib`가 필요하다. 2026-11-13에는 Python 3.14, pandas 3.1.1, openpyxl 3.1.5, matplotlib 3.11.2로 검증했다.
 - 라이브러리는 사용자 PC에 직접 설치하지 않고 **임시 폴더에 가상환경(venv)을 만들어** 설치했다. 임시 가상환경과 예제 엑셀·스크립트는 저장소에 없으므로 다른 PC에서는 다시 만들어야 한다.
 - matplotlib 한글 폰트는 Windows의 `Malgun Gothic`을 썼다(`plt.rcParams["font.family"]`). 다른 OS에서는 그 PC에 있는 한글 폰트로 바꾼다.
+- **이미지 글자는 무료 폰트만 쓴다**(`공통지침-블로그.md`, 2026-11-16 사용자 추가). 맑은 고딕은 Windows에 딸린 폰트라 앞으로 이미지에 쓰지 않는다. 이 PC에는 무료 폰트(SIL OFL) `C:/Windows/Fonts/NotoSansKR-VF.ttf`(Noto Sans KR, 가변 폰트)가 있다. Pillow에서는 `ImageFont.truetype(경로, 크기)` 후 `font.set_variation_by_name("Bold")`(보통체는 "Regular")로 굵기를 고른다. 없는 PC에서는 Noto Sans KR·나눔고딕·Pretendard 같은 무료 폰트를 설치해 쓴다. matplotlib 차트도 같은 폰트로 바꾼다. 이미 만든 이미지(블랙프라이데이 글까지)는 맑은 고딕 그대로 두고, 다음 글부터 적용한다.
 - 터미널 출력의 한글이 깨져 보일 수 있지만(콘솔 인코딩) 파일 내용에는 문제가 없었다.
 - `.idea/`는 IntelliJ 개인 설정이라 커밋하지 않는다. 2026-11-14 루트 `.gitignore`에 `.idea/`를 넣었다.
 
