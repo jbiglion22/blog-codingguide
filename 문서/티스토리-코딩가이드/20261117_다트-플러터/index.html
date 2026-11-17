@@ -1,0 +1,158 @@
+<!--
+==================== 티스토리 발행 안내 ====================
+[블로그] 티스토리 코딩가이드 (https://coding-guide.tistory.com/)
+[카테고리] 앱개발 (안드로이드)
+[글 제목] 다트(Dart)와 플러터(Flutter)는 무엇일까? 처음 20위 안에 든 언어와 코틀린 앱 개발 비교
+[태그] 다트, Dart, 플러터, Flutter, 크로스플랫폼, 앱개발, 코틀린, 코틀린멀티플랫폼, TIOBE, DartPad
+[검색 설명] 2026년 11월 TIOBE 순위에서 다트가 처음으로 20위 안에 들었습니다. 다트와 플러터가 무엇인지, 직접 실행해 본 다트 예제 코드, 코틀린으로 만드는 안드로이드 앱과 무엇이 다른지 정리했습니다.
+[글자 수] 본문 공백 포함 4,189자 / 공백 제외 3,286자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함)
+
+[사용 방법]
+1. 티스토리 글쓰기 > 에디터를 "HTML" 모드로 바꾼 뒤, 이 주석 아래부터 마지막 줄까지 전부 붙여넣기
+   (글 제목은 티스토리 제목 칸에 위 [글 제목]을 따로 입력)
+2. 본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 images 폴더의 같은 파일을 업로드하고, 빨간 글씨 줄은 지운다.
+   ("기본모드"로 바꾸면 빨간 글씨가 잘 보인다. 대표이미지는 01 사용)
+3. 이 글은 바로 앞 글 「2026년 11월 프로그래밍 언어 순위」와 이어진다. 앞 글을 먼저 발행하고, 본문 첫 문단에 앞 글 링크를 걸면 좋다.
+4. 이미지 순서(글 순서와 같음):
+   01-타이틀.png               ChatGPT 제작 (실사풍 + 제목 글자, 1:1, 테두리 포함 요청)
+   02-다트-한눈에.png           AI 제작 도식 (얇은 선 + 아이콘)
+   03-코드-하나로-여러-기기.png   AI 제작 도식 (왼쪽 띠)
+   04-앱-테스트-실사.png         ChatGPT 제작 (실사풍)
+   05-같은-앱-여러-화면-실사.png   ChatGPT 제작 (실사풍)
+   06-세-가지-방법-비교.png       AI 제작 비교표 (카드)
+   07-누구에게-맞을까.png        AI 제작 도식 (모서리 꺾쇠 + 아이콘)
+
+[기준과 확인 내용] 2026년 11월 17일 기준
+- TIOBE 공식 https://www.tiobe.com/tiobe-index/ : Dart 20위 0.74%(작년 26위), 처음 Top 20 진입, "플러터가 주된 원동력", "다트 자체는 특별하지 않다".
+- flutter.dev, flutter.dev/showcase : 구글이 지원·사용, 코드 하나로 모바일·웹·데스크톱·임베디드, 핫 리로드("상태를 잃지 않고 거의 바로 반영"),
+  ARM·Intel 기계어와 JavaScript로 컴파일. 쇼케이스: 구글(Google Pay, Google Earth, NotebookLM, Google Classroom 등), Toyota, BMW, LG Electronics,
+  Alibaba Group(새 기능 개발 기간 1개월 → 2주 인용) 등.
+- 위키백과(Flutter): 2018.12.4 Flutter 1.0, 자체 렌더링 엔진으로 위젯을 직접 그림(Impeller/Skia).
+- dart.dev/overview, 위키백과(Dart): 구글 개발, 2011년 공개, 2013년 1.0, AOT로 ARM·x64 기계어, 웹은 JavaScript·WebAssembly, 기본 sound null safety(Dart 3부터 필수).
+- kotlinlang.org/multiplatform : Kotlin Multiplatform은 JetBrains 개발, 비즈니스 로직 공유하고 UI는 네이티브 가능. Compose Multiplatform은 선택형 UI로
+  Android·iOS·데스크톱 stable, 웹 Beta.
+- 2026.11.17 검수 반영 근거: dart.dev/null-safety(물음표=null 허용), dart.dev/overview(웹·서버·명령줄), docs.flutter.dev/platform-integration(플랫폼별 설정·네이티브 코드).
+- 예제 코드는 2026.11.17 DartPad(dartpad.dev, Flutter 3.51.0 · Dart 3.14.0)에서 실제로 실행했고, 실행 결과는 그 출력 그대로다.
+  처음 버전은 null 변수를 바로 써서 "Dead code" 경고가 나와, null일 수 있는 값을 돌려주는 함수로 바꿔 경고 없이 다시 실행했다(print 사용 안내만 남음).
+- 버전 숫자는 자주 바뀌어 본문에는 DartPad에서 확인한 다트 버전만 적었다.
+-->
+<div style="font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; line-height:1.8; font-size:17px;">
+
+<p style="color:#777; font-size:14px;">작성일 2026.11.17 · 앱개발 · 다트 3.14.0(DartPad)으로 예제 실행</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 - 다트와 플러터 (01-타이틀.png) ]]</p>
+
+<p>지난 글에서 2026년 11월 프로그래밍 언어 순위를 살펴봤습니다. 그때 가장 눈에 띈 소식이 다트(Dart)가 처음으로 20위 안에 들었다는 것이었습니다. 1년 전 26위였던 언어가 20위로 올라온 겁니다.</p>
+
+<p>순위를 발표한 TIOBE는 그 이유를 한마디로 정리했습니다. 다트 자체가 특별하다기보다, 다트로 만드는 앱 개발 도구 '플러터(Flutter)'가 인기를 끌면서 같이 올라왔다는 것입니다. 그래서 이번 글에서는 다트와 플러터가 무엇인지, 다트 코드는 어떻게 생겼는지 직접 실행해 보고, 안드로이드 앱을 코틀린으로 만드는 방식과 무엇이 다른지 비교해 보겠습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다트는 어떤 언어일까</h2>
+
+<p>다트는 구글이 만든 프로그래밍 언어입니다. 2011년에 처음 공개됐고 2013년에 1.0 버전이 나왔습니다. 처음에는 웹 브라우저에서 자바스크립트를 대신하려고 만들었지만 그쪽에서는 크게 자리 잡지 못했습니다. 지금 다트가 가장 많이 쓰이는 곳은 플러터 앱 개발이지만, 플러터 전용 언어는 아니어서 웹, 서버, 명령줄 프로그램도 만들 수 있습니다.</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 다트 한눈에 보기 (02-다트-한눈에.png) ]]</p>
+
+<p>특징을 몇 가지만 꼽으면 이렇습니다.</p>
+
+<ul style="margin:8px 0 16px 20px;">
+<li><b>문법이 익숙하다</b>: 자바, 자바스크립트, C#을 써 본 사람이라면 금방 읽을 수 있는 모양입니다.</li>
+<li><b>빠르게 실행된다</b>: 앱으로 만들 때는 휴대폰의 기계어(ARM, x64)로 미리 바꿔 두기 때문에 빠르게 돌아갑니다. 웹으로 만들 때는 자바스크립트나 웹어셈블리로 바꿉니다.</li>
+<li><b>null 안전성</b>: 값이 없을 수 있는(null이 될 수 있는) 변수에는 물음표(?)를 붙이도록 해서, null 때문에 앱이 죽는 실수를 미리 막습니다. 다트 3부터는 이 방식이 필수입니다. 코틀린을 써 본 분이라면 낯익은 개념입니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다트 코드, 직접 실행해 봤습니다</h2>
+
+<p>다트는 설치하지 않아도 브라우저에서 바로 써 볼 수 있습니다. 구글이 운영하는 DartPad(dartpad.dev)에 코드를 붙여 넣고 Run 버튼을 누르면 됩니다. 아래 코드는 제가 DartPad(다트 3.14.0)에서 실제로 실행한 코드입니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>void main() {
+  var appName = '코딩가이드';      // 타입을 알아서 정한다
+  final int year = 2026;           // 한 번만 넣을 수 있다
+  print('$appName 블로그, $year년'); // 문자열 안에 변수 넣기
+
+  String? nickname = findNickname(false); // ?가 붙으면 null이 될 수 있다
+  print('닉네임 길이: ${nickname?.length ?? 0}');
+
+  var languages = ['Python', 'C', 'Java', 'C++', 'C#'];
+  for (var i = 0; i &lt; languages.length; i++) {
+    print('${i + 1}위: ${languages[i]}');
+  }
+
+  print('다트는 20위 안에 들었나요? ${isTop20(20)}');
+}
+
+String? findNickname(bool has) =&gt; has ? '가이드' : null;
+
+bool isTop20(int rank) =&gt; rank &lt;= 20;</code></pre>
+
+<p>실행 결과는 이렇게 나왔습니다.</p>
+
+<pre style="background:#f4f6fa; color:#1f2430; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>코딩가이드 블로그, 2026년
+닉네임 길이: 0
+1위: Python
+2위: C
+3위: Java
+4위: C++
+5위: C#
+다트는 20위 안에 들었나요? true</code></pre>
+
+<p>코드를 하나씩 보면, <code>var</code>는 값을 보고 타입을 알아서 정하고, <code>final</code>은 한 번 넣은 값을 바꿀 수 없게 합니다. 문자열 안에서 <code>$변수</code>나 <code>${식}</code>으로 값을 바로 넣을 수 있습니다. <code>String?</code>은 "문자열이거나 <code>null</code>(값이 아예 없음)일 수 있다"는 뜻입니다. 빈 문자열 <code>''</code>과는 다릅니다. 물음표로 null 가능성을 표시해 두면, 그냥 <code>nickname.length</code>라고 쓸 때 다트가 실행 전에 막아 줍니다. 그래서 <code>nickname?.length ?? 0</code>처럼 "null이 아니면 길이를, null이면 0을 써라"라고 안전하게 써야 합니다. 마지막 줄처럼 한 줄짜리 함수는 <code>=&gt;</code>로 짧게 쓸 수 있습니다.</p>
+
+<p>파이썬만 써 본 분이라면 중괄호와 세미콜론이 조금 낯설 수 있지만, 코틀린이나 자바를 써 본 분이라면 거의 바로 읽힐 겁니다.</p>
+
+<p>참고로 처음에는 <code>String? nickname;</code>처럼 값을 넣지 않은 변수를 바로 썼는데, DartPad가 "이 부분은 실행될 일이 없는 코드(Dead code)"라고 경고를 띄웠습니다. 값이 늘 null인 게 뻔하니 null을 대비한 처리가 쓸모없다는 뜻입니다. 이렇게 실수를 미리 알려 주는 것도 다트 도구의 장점입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">플러터는 무엇이 다를까</h2>
+
+<p>플러터는 구글이 만든 앱 개발 도구(프레임워크)로, 2018년 12월에 1.0 버전이 나왔습니다. 가장 큰 특징은 코드 하나로 여러 기기용 앱을 만든다는 점입니다. 같은 다트 코드로 안드로이드, 아이폰, 웹, 윈도우·맥·리눅스 데스크톱 앱까지 만들 수 있습니다. 다만 모든 앱을 고치지 않고 그대로 내보낼 수 있다는 뜻은 아닙니다. 카메라·결제 같은 기기 기능은 쓰는 플러그인이 그 플랫폼을 지원하는지에 따라 플랫폼별 설정이나 네이티브 코드(코틀린·스위프트 등)가 따로 필요할 수 있습니다. 화면과 대부분의 로직을 함께 쓰는 것이 핵심입니다.</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 코드 하나로 여러 기기 (03-코드-하나로-여러-기기.png) ]]</p>
+
+<p>이게 가능한 이유는 화면을 그리는 방식에 있습니다. 보통 안드로이드 앱은 안드로이드가 주는 버튼을, 아이폰 앱은 아이폰이 주는 버튼을 씁니다. 플러터는 이런 기본 부품을 빌려 쓰지 않고, 자체 그리기 엔진으로 버튼과 글자를 화면에 직접 그립니다. 그래서 어떤 기기에서든 거의 같은 모양으로 보입니다.</p>
+
+<p>개발할 때 편한 점도 있습니다. 코드를 고치고 저장하면 앱을 처음부터 다시 켜지 않아도 바뀐 모습이 거의 바로 화면에 반영됩니다. 이걸 '핫 리로드'라고 하는데, 버튼 색 하나 바꾸려고 몇십 초씩 기다리던 일을 크게 줄여 줍니다.</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 휴대폰과 노트북으로 앱을 테스트하는 모습 (04-앱-테스트-실사.png) ]]</p>
+
+<p>실제로 어떤 앱들이 플러터로 만들어졌는지 플러터 공식 사이트의 소개 페이지를 보면, 구글 페이(Google Pay), 구글 어스, 노트북LM 같은 구글 앱부터 토요타, BMW, LG전자 같은 큰 회사들의 이름이 올라 있습니다. 알리바바는 플러터를 쓴 뒤 새 기능을 만드는 데 걸리던 시간이 한 달에서 2주로 줄었다고 소개됐습니다.</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 휴대폰과 태블릿에 뜬 같은 앱 (05-같은-앱-여러-화면-실사.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">코틀린으로 만드는 안드로이드 앱과 비교하면</h2>
+
+<p>코틀린으로 안드로이드 앱을 만들고 있다면 "코틀린으로 하던 걸 플러터로 바꿔야 하나?"가 가장 궁금할 수 있습니다. 앱을 만드는 대표적인 방법 세 가지를 나란히 놓아 봤습니다.</p>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 앱을 만드는 세 가지 방법 비교 (06-세-가지-방법-비교.png) ]]</p>
+
+<p><b>코틀린 + 안드로이드</b>는 구글이 안드로이드 개발에 권하는 기본 방법입니다. 안드로이드의 새 기능을 가장 먼저, 가장 자연스럽게 쓸 수 있습니다. 대신 아이폰 앱이 필요하면 스위프트로 따로 만들어야 합니다.</p>
+
+<p><b>다트 + 플러터</b>는 코드 하나로 안드로이드와 아이폰을 함께 만듭니다. 혼자 또는 작은 팀이 두 플랫폼을 다 챙겨야 할 때 특히 유리합니다. 대신 기기의 아주 새로운 기능을 쓰려면 플러터가 지원해 줄 때까지 기다리거나, 그 부분만 따로 코드를 써야 할 때가 있습니다.</p>
+
+<p><b>코틀린 멀티플랫폼</b>은 코틀린을 만든 회사 젯브레인스(JetBrains)가 내놓은 방법입니다. 데이터 처리 같은 핵심 로직은 코틀린으로 한 번만 쓰고, 화면은 플랫폼별로 따로 만들거나 함께 쓰는 'Compose Multiplatform'을 고를 수 있습니다. Compose Multiplatform은 안드로이드·아이폰·데스크톱에서 정식(stable) 단계이고, 웹은 아직 베타입니다. 이미 코틀린을 쓰고 있다면 익숙한 언어 그대로 아이폰까지 넓힐 수 있다는 점이 장점입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">그래서 누구에게 맞을까</h2>
+
+<p style="color:#e60000;font-weight:bold;">[[ 이미지: 나에게 맞는 방법 고르기 (07-누구에게-맞을까.png) ]]</p>
+
+<p>처음 앱을 만들어 보는데 안드로이드와 아이폰 모두에 내고 싶다면 플러터가 좋은 출발점입니다. 다트 문법이 어렵지 않고, 코드 하나로 두 플랫폼을 다 볼 수 있어서 결과를 빨리 확인할 수 있습니다.</p>
+
+<p>이미 코틀린으로 안드로이드 앱을 만들고 있다면 굳이 갈아탈 필요는 없다고 생각합니다. 안드로이드에만 낼 앱이라면 지금 방식이 가장 자연스럽고, 아이폰까지 넓히고 싶어질 때 코틀린 멀티플랫폼을 먼저 살펴보는 편이 익숙한 코드를 살릴 수 있습니다. 어느 쪽이든 '어떤 기기에 낼 앱인가'를 먼저 정하면 고르기가 훨씬 쉬워집니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">마치며</h2>
+
+<p>다트가 20위 안에 든 건 언어 하나의 인기라기보다, "앱 하나를 여러 기기에 한 번에"라는 수요가 그만큼 커졌다는 신호로 보입니다. 플러터든 코틀린 멀티플랫폼이든, 같은 코드로 여러 플랫폼을 챙기려는 흐름은 앞으로도 이어질 것 같습니다.</p>
+
+<p>다트가 궁금하다면 DartPad에서 위 코드를 붙여 넣고 Run 버튼부터 눌러 보세요. 설치 없이 1분이면 첫 다트 프로그램을 실행해 볼 수 있습니다.</p>
+
+</div>

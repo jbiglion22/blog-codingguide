@@ -221,3 +221,43 @@ def frame_title(im, col="#ffe14d", border=34, inner=8, radius=36, edge="#1f2430"
     d.rounded_rectangle((border - 2, border - 2, W - border + 1, H - border + 1), radius + 2, outline="white", width=inner)
     d.rectangle((0, 0, W - 1, H - 1), outline=edge, width=4)
     return out
+
+
+def ico_code(d, x, y, s, col):
+    """코드 괄호 < / >."""
+    w = max(3, int(s * .1))
+    d.line((x + s * .32, y + s * .2, x + s * .05, y + s * .5, x + s * .32, y + s * .8), fill=col, width=w, joint="curve")
+    d.line((x + s * .68, y + s * .2, x + s * .95, y + s * .5, x + s * .68, y + s * .8), fill=col, width=w, joint="curve")
+    d.line((x + s * .58, y + s * .12, x + s * .42, y + s * .88), fill=col, width=w)
+
+
+def ico_phone(d, x, y, s, col):
+    d.rounded_rectangle((x + s * .22, y, x + s * .78, y + s), s * .1, fill=col)
+    d.rectangle((x + s * .3, y + s * .1, x + s * .7, y + s * .82), fill="white")
+    d.ellipse((x + s * .45, y + s * .86, x + s * .55, y + s * .95), fill="white")
+
+
+def ico_laptop(d, x, y, s, col):
+    d.rounded_rectangle((x + s * .12, y + s * .12, x + s * .88, y + s * .68), s * .06, fill=col)
+    d.rectangle((x + s * .18, y + s * .18, x + s * .82, y + s * .62), fill="white")
+    d.polygon([(x, y + s * .74), (x + s, y + s * .74), (x + s * .92, y + s * .86), (x + s * .08, y + s * .86)], fill=col)
+
+
+def ico_bars(d, x, y, s, col):
+    """막대 그래프."""
+    for i, h in enumerate((.45, .7, .95)):
+        bx = x + s * (.08 + i * .32)
+        d.rectangle((bx, y + s * (1 - h), bx + s * .24, y + s), fill=col)
+
+
+def ico_bolt(d, x, y, s, col):
+    """번개(빠름)."""
+    d.polygon([(x + s * .6, y), (x + s * .15, y + s * .58), (x + s * .45, y + s * .58), (x + s * .35, y + s),
+               (x + s * .85, y + s * .38), (x + s * .55, y + s * .38)], fill=col)
+
+
+def ico_shield(d, x, y, s, col):
+    """방패(안전)."""
+    d.polygon([(x + s * .5, y), (x + s * .92, y + s * .15), (x + s * .85, y + s * .6), (x + s * .5, y + s),
+               (x + s * .15, y + s * .6), (x + s * .08, y + s * .15)], fill=col)
+    d.line((x + s * .3, y + s * .5, x + s * .45, y + s * .65, x + s * .72, y + s * .35), fill="white", width=max(3, int(s * .1)), joint="curve")
