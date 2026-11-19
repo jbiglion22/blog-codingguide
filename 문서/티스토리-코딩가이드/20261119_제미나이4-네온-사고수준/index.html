@@ -1,0 +1,187 @@
+<!--
+==================== 티스토리 발행 안내 ====================
+[블로그] 티스토리 코딩가이드 (https://coding-guide.tistory.com/)
+[카테고리] IT 정보
+[글 제목] 제미나이 4 네온 '사고 수준' 4단계, 무엇이 달라질까
+[태그] 제미나이4네온, 제미나이, Gemini, 사고수준, thinking_level, 구글AI, AI모델, 추론모델, 토큰, AI요금, IT정보
+[검색 설명] 구글 제미나이 4 네온은 AI가 답하기 전에 얼마나 깊이 생각할지를 low·medium·high·xhigh 네 단계로 고를 수 있습니다. 사고 수준이 무엇인지, 단계마다 속도·비용·추론 품질이 어떻게 달라지는지, 생각에도 요금이 붙는 이유, 가장 높은 단계가 늘 좋지는 않은 이유를 구글 공식 문서 기준으로 정리했습니다.
+[글자 수] 본문 공백 포함 3,669자 / 공백 제외 2,872자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.19)
+[본문 글자 크기] 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px). 모바일 우선(도식 1,080px, 문단 2~3문장).
+[추천 발행 시기] 2026년 11월 19~22일.
+[함께 링크] 네이버 「제미나이 4 네온 출시, 아르곤·카본·하이드로젠과 무엇이 다를까」 https://blog.naver.com/codingguide/224483121002
+
+[사용 방법]
+1. 티스토리 글쓰기 > 에디터를 "HTML" 모드로 바꾼 뒤, 이 주석 아래부터 마지막 줄까지 전부 붙여넣기
+   (글 제목은 티스토리 제목 칸에 위 [글 제목]을 따로 입력)
+2. 본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 images 폴더의 같은 파일을 업로드하고, 빨간 글씨 줄은 지운다.
+3. 이미지 순서(글 순서와 같음):
+   01-타이틀.png                ChatGPT 요청 (1:1)
+   02-사고-수준-4단계.png        AI 제작 (4:5, 왼쪽 띠)
+   03-생각-다이얼-3D.png         ChatGPT 요청 (3D 일러스트, 1:1)
+   04-생각에도-요금.png          AI 제작 (4:5, 겹선)
+   05-모델별-기본값.png          AI 제작 (1:1, 카드)
+   06-개발자-책상-실사.png       ChatGPT 요청 (실사, 3:2)
+   07-어떤-일에-어느-단계.png    AI 제작 (4:5, 점선)
+   08-xhigh-주의.png            AI 제작 (1:1, 꺾쇠)
+
+[기준과 확인 내용] 2026년 11월 19일 확인
+- 구글 공식 문서 「Gemini thinking」 https://ai.google.dev/gemini-api/docs/thinking (aistudio.google.com/docs/thinking 로 연결됨, 내장 브라우저로 확인):
+  · 모델별 표: gemini-4-carbon·gemini-4-argon 기본 On(medium), 지원 low·medium·high / gemini-4-neon·gemini-4-hydrogen 기본 On(high), 지원 low·medium·high·xhigh
+  · "The thinking_level is your main control over quality, latency, and token use in Gemini 4 Neon and Gemini 4 Hydrogen."
+  · low: 토큰 가장 적음·지연 가장 낮음, 비용·속도에 민감한 작업(빠른 채팅, 대량 처리) / medium: 토큰 적고 응답 빠름, 대화형 코딩·UI 시안·반응 빠른 채팅 / high: 지능과 속도의 균형, 네온·하이드로젠의 권장 기본값(복잡한 코딩, 에이전트 실행, 도구 호출, 멀티모달 지식 작업) / xhigh: 토큰 가장 많음·가장 깊은 추론, high로 부족한 어려운 다단계 코딩·에이전트 문제에만
+  · "Start with high for most complex tasks, and reserve xhigh for hard, multi-step problems where high falls short. Using xhigh increases latency and token use and can cause overthinking or exhaust max_output_tokens on simpler prompts such as text or JSON extraction. Run your evaluations at all four levels ... then pick the lowest thinking_level that meets your quality bar."
+  · 요금: "When thinking is turned on, response pricing is the sum of output tokens and thinking tokens." 요약만 내보내도 전체 생각 토큰 기준으로 과금. total_thought_tokens 필드로 확인.
+  · max_output_tokens에는 생각 토큰이 포함됨. 생각 도중 한도에 닿으면 status "incomplete"로 잘리거나 빈 답이 나오고 생각 토큰은 과금됨. 비용·지연을 줄이려면 작은 max_output_tokens 대신 thinking_level을 낮추라는 안내.
+  · 생각 요약(thought summaries)은 기본으로는 나오지 않고 thinking_summaries 설정으로 켬.
+  · 예시 코드(thinking_level을 generation_config에 지정)는 공식 문서의 형태를 옮긴 것. 이 글에서 실행해 본 것은 아님(API 키 필요).
+- 구글 공식 블로그 「Introducing Gemini 4 Neon」(2026.11.18) https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/ : "Neon's four levels scale steadily, letting teams dial intelligence and token spend", 기본 high에서 카본보다 작업당 비용 32% 낮음(Artificial Analysis Intelligence Index 기준 비교), xhigh에서 가장 높은 지능 점수(61점은 xhigh 사고 수준), 가격 출력 100만 토큰당 15달러.
+- 직접 계산(가정한 예시): 답 1,000토큰 + 생각 1,000토큰 = 2,000 × 15달러/100만 = 0.03달러(약 40원), 답 1,000 + 생각 10,000 = 11,000 × 15/100만 = 0.165달러(약 220원). 환율 1,333원(11/18 종가 보도). 생각 토큰 수는 설명을 위한 가정이며 실제 값은 문제마다 다름.
+- 일반 지식으로 쓴 것: 추론(사고) 모델이 답하기 전에 중간 생각을 만든다는 설명, 토큰의 뜻.
+- 확인하지 못해 쓰지 않은 것: 제미나이 앱(일반 이용자 화면)에서 사고 수준을 직접 고를 수 있는지, 단계별 실제 평균 토큰 수·응답 시간.
+- [2026.11.19 외부 검수 반영(다섯 가지)] ① '더 잘 푼다·정확도' → '추론 품질이 좋아질 수 있다, 늘 더 정확해지는 것은 아님' ② 기본값 high는 '구글 공식 API 문서에 따르면' ③ 5.5배는 '가정한 토큰 수로 계산한 예시에서' ④ 32%는 Artificial Analysis Intelligence Index 과제 기준 비교·모든 작업 아님(공식 블로그 원문: 'At its default high thinking level, it pairs a high Artificial Analysis Intelligence Index score with a 32% lower cost per task than Carbon') ⑤ '단계를 낮추면 답이 끝까지 나온다' → '생각 토큰을 줄이는 데 도움, 단계를 낮춰도 한도에 닿으면 잘릴 수 있음'.
+- 다른 회사 AI와의 비교는 쓰지 않음.
+==========================================================
+-->
+
+<p style="font-size:16px;">시험 문제를 풀 때 쉬운 문제는 바로 답을 쓰고, 어려운 문제는 한참 고민합니다. 요즘 AI도 비슷합니다. 다만 AI는 <b>'얼마나 고민할지'를 사람이 정해 줄 수</b> 있습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">구글이 11월 18일 공개한 <b>제미나이 4 네온(Gemini 4 Neon)</b>에는 이 설정이 네 단계로 들어 있습니다. 이름은 <b>'사고 수준(thinking level)'</b>입니다.</p>
+
+<p style="font-size:16px;">이 글에서는 사고 수준이 무엇인지, 단계마다 무엇이 달라지는지, 왜 가장 높은 단계가 늘 정답은 아닌지를 구글 공식 문서를 기준으로 정리했습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">사고 수준이란 무엇일까</h2>
+
+<p style="font-size:16px;">요즘 AI 모델은 질문을 받으면 바로 답을 쓰지 않습니다. 먼저 속으로 문제를 나누고, 방법을 따져 보고, 스스로 검토한 뒤에 답을 내놓습니다. 이 과정을 '생각(thinking)'이라고 부릅니다.</p>
+
+<p style="font-size:16px;">생각을 많이 하면 어려운 문제에서 추론 품질이 좋아질 수 있습니다. 다만 늘 더 정확해지는 것은 아니고, 대신 <b>시간이 더 걸리고 비용도 더 듭니다</b>. 생각하는 과정에서도 AI가 글자 조각(토큰)을 만들어 내기 때문입니다.</p>
+
+<p style="font-size:16px;">사고 수준은 이 생각의 깊이를 조절하는 설정입니다. 구글 문서는 이것을 네온에서 <b>품질, 응답 속도, 토큰 사용량을 조절하는 가장 중요한 손잡이</b>라고 설명합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">네온의 네 단계: low, medium, high, xhigh</h2>
+
+<p style="font-size:16px;">네온에서 고를 수 있는 단계는 네 가지입니다. 구글 공식 문서의 설명을 옮기면 이렇습니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>low(낮음)</b>: 토큰을 가장 적게 쓰고 가장 빠릅니다. 빠른 채팅, 많은 양을 한꺼번에 처리하는 일처럼 비용과 속도가 중요한 작업에 씁니다.</li>
+<li><b>medium(중간)</b>: 토큰을 적게 쓰고 응답이 빠릅니다. 대화하듯 주고받는 코딩, 화면 시안 만들기처럼 반응이 빨라야 하는 일에 맞습니다.</li>
+<li><b>high(높음)</b>: 똑똑함과 속도의 균형입니다. 복잡한 코딩, 여러 단계를 거치는 작업 등 대부분의 일에 권장되는 <b>기본값</b>입니다.</li>
+<li><b>xhigh(매우 높음)</b>: 토큰을 가장 많이 쓰고 가장 깊이 생각합니다. high로는 부족한, 어렵고 여러 단계를 거치는 문제에만 쓰라고 안내합니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 사고 수준 4단계 (02-사고-수준-4단계.png) ]]</p>
+
+<p style="font-size:16px;">구글 공식 API 문서에 따르면 네온의 기본 사고 수준은 <b>high</b>입니다. 개발자가 단계를 따로 정하지 않으면 이 값이 쓰입니다. 구글은 새 모델을 낼 때마다 이 단계를 다듬고 있고, 네온의 네 단계는 한 단계씩 고르게 올라가도록 만들었다고 밝혔습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 생각의 깊이를 고르는 다이얼 (03-생각-다이얼-3D.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">생각에도 요금이 붙는다</h2>
+
+<p style="font-size:16px;">사고 수준이 비용과 이어지는 이유는 요금 계산 방식에 있습니다. 구글 문서에 따르면 응답 요금은 <b>답으로 나온 토큰 + 생각에 쓴 토큰</b>을 합쳐서 매깁니다.</p>
+
+<p style="font-size:16px;">생각 과정은 기본으로는 화면에 보이지 않습니다. 설정을 켜면 요약만 볼 수 있습니다. 그런데 요금은 요약이 아니라 <b>실제로 만든 생각 토큰 전체</b>를 기준으로 붙습니다. 보이지 않는 부분에도 돈이 드는 셈입니다.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">예를 들어 계산해 보면</h3>
+
+<p style="font-size:16px;">네온의 출력 가격은 100만 토큰당 15달러입니다. 답의 길이가 똑같이 1,000토큰이라고 하고, 생각에 쓴 토큰만 다르다고 가정해 보겠습니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>생각 1,000토큰</b>: (1,000 + 1,000) × 15달러 ÷ 100만 = 0.03달러, 약 40원</li>
+<li><b>생각 10,000토큰</b>: (1,000 + 10,000) × 15달러 ÷ 100만 = 0.165달러, 약 220원</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 생각에도 요금이 붙는다 (04-생각에도-요금.png) ]]</p>
+
+<p style="font-size:16px;">가정한 토큰 수로 계산한 이 예시에서는, 같은 길이의 답인데 비용이 5.5배 차이 납니다. 생각 토큰 수는 설명을 위해 정한 숫자입니다. 실제로 생각에 쓰는 토큰은 문제와 단계에 따라 달라집니다.</p>
+
+<p style="font-size:16px;">한 번이면 몇십 원 차이지만, 하루에 수만 번 AI를 부르는 서비스라면 이 설정 하나로 비용이 크게 달라집니다. 그래서 사고 수준은 개발자에게 중요한 설정입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">같은 제미나이 4라도 모델마다 다르다</h2>
+
+<p style="font-size:16px;">제미나이 4의 네 모델이 모두 네 단계를 쓰는 것은 아닙니다. 구글 문서의 표를 보면 둘씩 나뉩니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>네온, 하이드로젠</b>: 네 단계(low·medium·high·xhigh), 기본값 high</li>
+<li><b>카본, 아르곤</b>: 세 단계(low·medium·high), 기본값 medium</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 모델별 사고 수준 기본값 (05-모델별-기본값.png) ]]</p>
+
+<p style="font-size:16px;">같은 'high'라도 뜻이 조금 다릅니다. 네온에서는 high가 기본값이고 그 위에 xhigh가 하나 더 있습니다. 카본과 아르곤에서는 high가 가장 깊이 생각하는 단계입니다.</p>
+
+<p style="font-size:16px;">발표에 나온 숫자를 읽을 때도 이 설정을 함께 봐야 합니다. 구글은 외부 평가기관의 종합 지수(Artificial Analysis Intelligence Index)를 측정하는 과제에서, 네온이 기본값인 high로 카본보다 작업당 비용이 32% 낮았다고 밝혔습니다. 이 평가 조건에서 나온 비교이고, 모든 작업에서 32% 싸다는 뜻은 아닙니다.</p>
+
+<p style="font-size:16px;">또 가장 높은 지능 점수는 xhigh에서 나왔다고 설명했습니다. <b>점수와 비용이 서로 다른 단계의 결과</b>일 수 있다는 뜻입니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 개발자의 책상 (06-개발자-책상-실사.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">어떤 일에 어느 단계를 쓸까</h2>
+
+<p style="font-size:16px;">구글이 권하는 방법은 단순합니다. <b>복잡한 일은 high에서 시작하고, xhigh는 high로 부족할 때만</b> 쓰라는 것입니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>간단한 분류, 짧은 답변, 대량 처리</b> → low</li>
+<li><b>대화형 코딩, 빠른 반응이 필요한 화면</b> → medium</li>
+<li><b>복잡한 코딩, 여러 도구를 쓰는 작업, 문서 분석</b> → high</li>
+<li><b>high로도 틀리는 어려운 다단계 문제</b> → xhigh</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 어떤 일에 어느 단계 (07-어떤-일에-어느-단계.png) ]]</p>
+
+<p style="font-size:16px;">문서에는 고르는 요령도 나옵니다. 내 작업을 네 단계 모두에서 시험해 보고, <b>원하는 품질을 채우는 가장 낮은 단계</b>를 고르라는 것입니다.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">설정은 한 줄</h3>
+
+<p style="font-size:16px;">개발자는 AI를 부르는 코드에 <code>thinking_level</code> 값을 하나 넣어 단계를 정합니다. 구글 공식 문서의 예시는 이런 모양입니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>interaction = client.interactions.create(
+    model="gemini-4-neon",
+    input="질문 내용",
+    generation_config={
+        "thinking_level": "low"
+    }
+)</code></pre>
+
+<p style="font-size:16px;">이 코드는 공식 문서의 형태를 옮긴 것이고, 이 글에서 직접 실행해 본 것은 아닙니다. 실행하려면 구글 AI 스튜디오에서 발급받는 API 키가 필요합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">xhigh가 늘 좋은 것은 아니다</h2>
+
+<p style="font-size:16px;">"그럼 가장 높은 단계로 두면 제일 좋지 않을까?" 하는 생각이 들 수 있습니다. 구글 문서는 그렇지 않다고 설명합니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>느려지고 비싸집니다</b>: xhigh는 응답 시간과 토큰 사용량이 늘어납니다.</li>
+<li><b>쉬운 일에서는 오히려 손해입니다</b>: 글에서 정보를 뽑아내는 것 같은 단순한 작업에서는 '지나치게 생각'할 수 있다고 합니다.</li>
+<li><b>답이 잘릴 수 있습니다</b>: 출력 한도에는 생각 토큰도 포함됩니다. 생각하다가 한도에 닿으면 답이 잘리거나 비어서 나오고, 그때까지 쓴 생각 토큰의 요금은 그대로 붙습니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: xhigh를 쓸 때 주의할 점 (08-xhigh-주의.png) ]]</p>
+
+<p style="font-size:16px;">그래서 비용이나 속도를 줄이고 싶을 때는 출력 한도를 작게 잡는 것보다 <b>사고 수준을 낮추는 쪽</b>이 낫다고 문서는 안내합니다. 한도를 줄이면 답이 잘릴 수 있지만, 단계를 낮추면 생각에 쓰는 토큰을 줄이는 데 도움이 됩니다. 물론 단계를 낮춰도 출력 한도에 닿으면 답은 잘릴 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">가장 높은 단계가 아니라 '충분한' 단계</h2>
+
+<p style="font-size:16px;">정리하면 사고 수준은 AI의 똑똑함을 올리는 버튼이라기보다, <b>추론 품질·속도·비용 사이에서 균형을 고르는 다이얼</b>입니다.</p>
+
+<ul style="font-size:16px;">
+<li>네온은 low·medium·high·xhigh 네 단계, 기본값은 high</li>
+<li>생각에 쓴 토큰도 출력 요금에 포함</li>
+<li>high에서 시작하고, xhigh는 high로 부족할 때만</li>
+<li>품질을 채우는 가장 낮은 단계를 고르는 것이 구글의 권장</li>
+</ul>
+
+<p style="font-size:16px;">이 글의 내용은 개발자가 API로 네온을 쓸 때의 설정입니다. 일반 이용자가 쓰는 제미나이 앱에서 이 단계를 직접 고를 수 있는지는 공식 문서에서 확인하지 못했습니다. 내용은 2026년 11월 19일에 확인한 구글 공식 문서와 발표를 기준으로 했고, 단계 이름과 기본값은 앞으로 바뀔 수 있습니다.</p>
