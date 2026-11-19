@@ -1,0 +1,202 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [업무 파이썬 초급 #0] 파이썬 설치하고 첫 글자 띄우기
+독자: 코딩을 해 본 적 없는 직장인(사무직·프리랜서·자영업). 윈도우 PC 기준.
+검색 설명: 업무 파이썬 초급 연재 0편. 파이썬을 윈도우에 설치하고, 함께 들어 있는 IDLE을 열어 첫 글자를 화면에 띄워 본다. 파일로 저장해 실행하는 법, 빨간 오류 메시지가 나올 때 읽는 법, 회사 PC에서 설치하기 전에 확인할 것까지 코딩을 처음 하는 직장인 눈높이로 정리했다.
+카테고리: 파이썬 코딩
+태그: #파이썬 #파이썬설치 #파이썬기초 #파이썬초보 #IDLE #업무자동화 #엑셀자동화 #직장인 #파이썬입문 #코딩초보
+글자 수: 본문 공백 포함 4,278자 / 공백 제외 3,336자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.19)
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 「초보도 업무에서 바로 쓰는 파이썬」 초급 0편(목차·규칙은 저장소 루트 '네이버-코딩가이드-업무파이썬-연재.md'). 이전 편 없음.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 이 연재의 1편을 발행한 뒤 1편 링크로 바꾼다(0편 발행 때는 줄을 지운다).
+
+[이미지 순서]
+01-타이틀.png (ChatGPT 요청, 1:1)
+02-연재-지도.png (AI, 4:5)
+03-저녁-책상.png (ChatGPT 요청, 3:2 실사)
+04-설치-세-걸음.png (AI, 4:5, 공식 문서 설명을 바탕으로 그린 도식 — 실제 설치 화면 아님)
+05-IDLE-화면-읽기.png (AI, 4:5, 공식 문서 설명을 바탕으로 그린 도식 — 실제 화면 캡처 아님)
+06-실행-결과.png (AI, 4:5, 이 PC에서 실행한 실제 출력으로 그림)
+07-안-될-때.png (AI, 4:5, 실제 오류 메시지)
+
+[근거 — 공식 문서 확인] 2026년 11월 19일
+- 「Using Python on Windows」 https://docs.python.org/3/using/windows.html : 윈도우에는 파이썬이 기본으로 들어 있지 않음. CPython 팀이 권하는 방법은 'Python install manager'이고 python.org/downloads 또는 Microsoft Store 앱에서 받을 수 있으며 둘은 같다. 설치는 스토어에서 Install, 또는 내려받은 파일을 더블클릭해 Install. 설치 뒤 터미널에서 python을 입력해 시작. 설치된 런타임이 하나도 없으면 python·py 실행 시 최신 버전이 자동 설치됨. 처음 런타임 설치 때 PATH에 폴더를 추가하라는 안내가 나올 수 있으나 선택 사항. 문제 해결: 'py/python not found'이면 Install manager를 설치했는지 확인, 시작에서 '앱 실행 별칭 관리(Manage app execution aliases)'를 열어 'Python (default)' 별칭이 켜져 있는지 확인, 이미 켜져 있으면 껐다 켜기.
+- 「python.org/downloads/windows」 : 2026.11.19 확인 시 최신 3.15.2(2026.10.25), Python install manager 26.4(MSIX·MSI), 전통적인 'Windows installer (64-bit)'도 따로 제공됨. 이 글은 공식 문서가 권하는 install manager 방식으로 썼다(전통 설치 파일 화면은 확인하지 못해 쓰지 않음).
+- 「IDLE — Python editor and shell」 https://docs.python.org/3/library/idle.html : IDLE은 Python의 통합 개발·학습 환경(셸 창 + 편집기 창). 선택 모듈이라 배포판에 없을 수 있음. File 메뉴 New File·Save·Open, Run 메뉴 Run Module(F5)은 오류가 없으면 실행하고 출력은 셸 창에 표시, print가 있어야 출력됨. 실행 방법 'python -m idlelib'. Shell에서 exit()로 종료.
+- [일반 지식·확인 못 한 것] 시작 메뉴 검색창에서 'IDLE'로 열리는지(install manager 설치 후 바로가기가 생기는지는 공식 문서에서 확인 못 함 → 본문은 '보일 수 있다'로 씀), IDLE 창의 정확한 모양(공식 문서 설명 바탕 도식), 설치 파일을 내려받은 뒤 나오는 화면 문구. 바탕화면이 OneDrive로 옮겨진 PC의 경로 차이는 다루지 않음.
+- [2026.11.19 외부 검수 반영(다섯 가지 모두 타당)] ① '>>>'는 설치 완료 표시가 아니라 파이썬 대화형 셸의 입력 프롬프트(터미널에서 python을 실행했을 때) ② IDLE은 '함께 들어 있는 경우가 많지만 설치 구성에 따라 빠질 수 있음'(공식 문서의 선택 모듈 설명) ③ IDLE이 안 열릴 때 '설치 다시 하기' 대신 '설치 구성에 IDLE이 포함됐는지 확인, 빠졌으면 포함하도록 구성 변경, 회사 PC는 IT 담당자'로 — **install manager에서 IDLE을 추가하는 구체적인 화면·명령은 확인하지 못해 쓰지 않음** ④ 회사 PC: '개인 PC에서 먼저 연습, 실제 업무 적용 땐 회사 보안 규정·프로그램 사용 정책 재확인' ⑤ '복사해서 붙이면 그대로 돌아가는 코드' → '안내한 환경(윈도우 PC)에서 실행을 확인한 코드, 버전·설정에 따라 달라질 수 있는 부분은 알려 줌'.
+- 코드 확인(2026.11.19): 이 글의 코드 세 줄을 윈도우 11·Python 3.14.5에서 실행 → '안녕하세요, 파이썬!' / '오늘부터 업무 자동화를' / '30'. 미션의 print(4500 * 20)은 90000. 오류 메시지 4종도 같은 환경에서 실제로 낸 것(unterminated string literal (detected at line 1), NameError: name 'Print' is not defined. Did you mean: 'print'?, SyntaxError: invalid character '“' (U+201C), '(' was never closed). 최신 3.15에서는 확인하지 않았고 오류 메시지 문구는 버전에 따라 조금 다를 수 있음.
+-->
+
+<p style="font-size:16px;">월말 금요일 오후, 폴더에 지점별 엑셀 파일이 열두 개 쌓여 있다고 해 볼게요. 하나씩 열어서 복사하고, 합칠 파일에 붙여 넣고, 다시 다음 파일을 엽니다. 한 시간이 금방 지나갑니다.</p>
+
+<p style="font-size:16px;">이런 일은 코드 몇 줄이면 끝나기도 합니다. 그리고 그 코드를 쓰는 법은 생각보다 어렵지 않아요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">오늘부터 「초보도 업무에서 바로 쓰는 파이썬」을 연재합니다. 코딩을 한 번도 해 본 적 없어도 괜찮습니다. 이번 0편에서는 파이썬을 설치하고, 화면에 첫 글자를 띄워 보는 데까지만 갑니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이 연재는 이렇게 진행합니다</h2>
+
+<p style="font-size:16px;">글 제목에는 줄여서 <b>[업무 파이썬 초급 #번호]</b>라고 붙입니다. 초급을 마치면 조금 더 어려운 <b>중급</b>으로 이어 갈 계획이에요.</p>
+
+<ul style="font-size:16px;">
+<li><b>한 편에 업무 하나</b>를 끝냅니다. 파일 이름 바꾸기, 폴더 정리, 엑셀 합치기 같은 실제 일이에요.</li>
+<li><b>문법은 필요할 때 하나씩만</b> 나옵니다. '변수가 무엇인가'부터 외우는 순서가 아니에요. 일을 하다 보면 자연스럽게 따라옵니다.</li>
+<li><b>안내한 환경에서 실행을 확인한 코드</b>만 싣습니다. 윈도우 PC에서 돌려 보고 결과를 확인했고, 파이썬 버전이나 설정에 따라 달라질 수 있는 부분은 그때그때 알려 드릴게요.</li>
+<li>어려운 말은 최대한 쉬운 말로 풀고, 꼭 필요한 용어만 괄호로 적습니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 연재 지도 (02-연재-지도.png) ]]</p>
+
+<p style="font-size:16px;">초급은 모두 13편입니다. 앞쪽은 파일과 폴더를 다루는 일, 가운데는 엑셀, 뒤쪽은 보고서와 PDF 순서예요. 이 글은 <b>윈도우 PC</b>를 기준으로 씁니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">파이썬이 대신해 주는 일</h2>
+
+<p style="font-size:16px;">앞으로 이런 일을 하나씩 해 볼 거예요.</p>
+
+<ul style="font-size:16px;">
+<li>폴더 속 파일 이름 100개를 한 번에 바꾸기</li>
+<li>다운로드 폴더를 문서·사진별로 정리하기</li>
+<li>엑셀 파일 12개를 하나로 합치고, 기준을 넘는 칸에 색칠하기</li>
+<li>PDF 여러 개를 하나로 붙이기</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 저녁 책상 (03-저녁-책상.png) ]]</p>
+
+<p style="font-size:16px;">다만 모든 일을 대신해 주지는 않아요. 파이썬이 잘하는 일은 <b>같은 일을 되풀이하는 것</b>입니다. 처음 한 번은 코드를 만드는 시간이 들지만, 그다음부터는 실행 한 번이면 돼요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">시작하기 전에, 회사 PC라면</h2>
+
+<p style="font-size:16px;">회사 컴퓨터는 프로그램을 마음대로 설치할 수 없게 막아 둔 곳이 많습니다.</p>
+
+<ul style="font-size:16px;">
+<li>설치하기 전에 <b>IT 담당자나 보안 규정</b>을 먼저 확인해 주세요.</li>
+<li>설치가 허용되지 않는다면 <b>개인 PC에서 먼저 연습</b>하세요. 실제 업무에 적용할 때는 회사의 보안 규정과 프로그램 사용 정책을 다시 확인해야 합니다.</li>
+<li>연습할 파일은 이 연재에서 <b>코드로 직접 만들어 드립니다.</b> 회사 문서나 개인정보가 든 파일로 연습하지 마세요.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">1단계: 파이썬 설치하기</h2>
+
+<p style="font-size:16px;">윈도우에는 파이썬이 기본으로 들어 있지 않습니다. 파이썬 공식 문서가 권하는 방법으로 설치해 볼게요. 파이썬을 설치하고 관리해 주는 '설치 도우미(Python install manager)'를 먼저 받는 방식입니다.</p>
+
+<ul style="font-size:16px;">
+<li>인터넷 브라우저에서 <b>python.org/downloads</b>에 들어갑니다.</li>
+<li>윈도우용 안내로 들어가 <b>Python install manager</b>를 내려받습니다. 마이크로소프트 스토어 앱에서 설치해도 같은 프로그램이라고 공식 문서가 안내합니다.</li>
+<li>스토어에서는 <b>Install</b> 버튼을 누르고, 내려받은 파일은 더블클릭해 <b>Install</b>을 고릅니다.</li>
+<li>설치가 끝나면 시작 메뉴에서 <b>터미널</b>(또는 명령 프롬프트)을 열어 <code>python</code>이라고 입력하고 엔터를 누릅니다. 설치된 파이썬이 없으면 최신 버전이 자동으로 설치돼요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 설치 세 걸음 (04-설치-세-걸음.png) ]]</p>
+
+<p style="font-size:16px;">중간에 'PATH에 폴더를 추가하겠느냐'는 안내가 나올 수 있는데, 공식 문서는 이것이 <b>선택 사항</b>이라고 설명합니다. 지금은 몰라도 괜찮아요.</p>
+
+<p style="font-size:16px;">터미널에서 <code>python</code>을 실행하면 파이썬 대화형 셸이 열리고, 화면에 <b>&gt;&gt;&gt;</b> 표시가 나타납니다. 이 표시는 설치 프로그램의 완료 표시가 아니라, 파이썬이 명령을 기다리고 있다는 입력 신호예요. 여기서 나가려면 <code>exit()</code>를 입력하세요. 버전 숫자는 시기에 따라 다를 수 있지만, 이 연재의 기초 코드는 같게 돌아갑니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">2단계: IDLE 열고 첫 글자 띄우기</h2>
+
+<p style="font-size:16px;">코드를 쓰려면 글을 쓰는 프로그램이 필요합니다. 파이썬 공식 배포판에는 <b>IDLE</b>이라는 프로그램이 함께 들어 있는 경우가 많아요(설치 구성에 따라 빠질 수도 있습니다). 코드를 쓰고 바로 실행해 볼 수 있는, 파이썬 공식 연습용 프로그램입니다.</p>
+
+<ul style="font-size:16px;">
+<li>설치 방식에 따라 시작 메뉴 검색창에 <b>IDLE</b>이라고 입력하면 보일 수 있어요.</li>
+<li>보이지 않으면 터미널을 열어 <code>python -m idlelib</code>이라고 입력해 보세요. 공식 문서에 나온 실행 방법입니다.</li>
+</ul>
+
+<p style="font-size:16px;">IDLE이 열리면 <b>Shell</b> 창이 나타납니다. 이 창에서는 한 줄씩 입력하고 바로 결과를 볼 수 있어요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: IDLE 화면 읽기 (05-IDLE-화면-읽기.png) ]]</p>
+
+<p style="font-size:16px;"><b>&gt;&gt;&gt;</b> 뒤에 아래 한 줄을 입력하고 엔터를 눌러 보세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>print("안녕하세요, 파이썬!")</code></pre>
+
+<p style="font-size:16px;">바로 아래에 <b>안녕하세요, 파이썬!</b>이 나타나면 성공입니다.</p>
+
+<p style="font-size:16px;"><code>print</code>는 괄호 안의 내용을 화면에 보여 주는 명령이에요. 따옴표(") 안에 있는 것은 글자로 취급합니다. 앞으로 가장 많이 만나게 될 명령이라서, 모양을 눈에 익혀 두면 좋아요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">3단계: 파일로 저장해서 실행하기</h2>
+
+<p style="font-size:16px;">한 줄씩 입력하는 방식은 연습에는 좋지만, 업무에 쓰려면 코드를 <b>파일로 저장해 두고</b> 필요할 때 돌려야 합니다. 그래서 이 연재의 코드는 모두 파일로 저장해서 실행해요.</p>
+
+<ul style="font-size:16px;">
+<li>바탕화면에 <b>파이썬연습</b>이라는 폴더를 하나 만듭니다. 앞으로 연습 파일은 모두 여기에 모을 거예요.</li>
+<li>IDLE 위쪽 메뉴에서 <b>File → New File</b>을 누르면 빈 창이 열립니다.</li>
+<li>아래 세 줄을 그대로 입력합니다.</li>
+</ul>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>print("안녕하세요, 파이썬!")
+print("오늘부터 업무 자동화를")
+print(10 * 3)</code></pre>
+
+<ul style="font-size:16px;">
+<li><b>File → Save</b>를 눌러 <b>파이썬연습</b> 폴더에 <b>hello.py</b>라는 이름으로 저장합니다. 파일 이름 끝의 <b>.py</b>는 파이썬 파일이라는 표시예요.</li>
+<li>위쪽 메뉴에서 <b>Run → Run Module</b>을 누릅니다. 키보드 <b>F5</b>를 눌러도 같습니다.</li>
+</ul>
+
+<p style="font-size:16px;">IDLE 문서에 따르면 Run Module은 코드에 오류가 없을 때 실행하고, 결과를 Shell 창에 보여 줍니다. 아래와 같이 나오면 됩니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (06-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">세 번째 줄을 보세요. <code>10 * 3</code>은 '10 곱하기 3'이라서 <b>30</b>이 나왔습니다. 곱하기 기호는 <code>*</code>이고, 숫자는 따옴표 없이 씁니다. 따옴표로 감싸면 계산하지 않고 글자 그대로 보여 줘요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<p style="font-size:16px;">처음에는 누구나 한 번쯤 빨간 글씨를 만납니다. 겁먹지 않아도 돼요. 오류 메시지는 <b>맨 아랫줄이 핵심</b>이고, 대부분 아주 사소한 실수입니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 (07-안-될-때.png) ]]</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">① 빨간 오류 메시지가 나올 때</h3>
+
+<ul style="font-size:16px;">
+<li><code>SyntaxError: unterminated string literal</code> — 글자를 감싼 따옴표 하나가 빠졌습니다. 닫는 따옴표를 확인하세요.</li>
+<li><code>NameError: name 'Print' is not defined</code> — <code>print</code>를 대문자 P로 썼어요. 파이썬은 대소문자를 구분합니다.</li>
+<li><code>SyntaxError: invalid character '“'</code> — 따옴표가 휘어진 모양으로 바뀌었어요. 글을 복사하는 과정에서 생기기도 합니다. 곧은 따옴표(")로 고쳐 주세요.</li>
+<li><code>'(' was never closed</code> — 괄호를 열고 닫지 않았습니다. 여는 괄호와 닫는 괄호의 개수를 맞춰 주세요.</li>
+</ul>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">② 터미널에서 python이 안 될 때</h3>
+
+<p style="font-size:16px;">공식 문서의 안내에 따르면, 먼저 설치 도우미(Python install manager)를 설치했는지 확인합니다. 그다음 시작 메뉴에서 <b>'앱 실행 별칭 관리'</b>(영문: Manage app execution aliases)를 열어 <b>Python (default)</b> 항목이 켜져 있는지 보세요. 이미 켜져 있다면 껐다가 다시 켜 보라고 안내합니다.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">③ IDLE이 열리지 않을 때</h3>
+
+<p style="font-size:16px;">터미널에서 <code>python -m idlelib</code>을 입력해 보세요. 그래도 열리지 않는다면 IDLE이 설치되어 있지 않거나 실행 환경에 문제가 있을 수 있어요. IDLE은 선택 구성 요소라 설치 구성에 따라 빠질 수 있다고 공식 문서가 설명합니다. 설치 구성에 IDLE이 포함되어 있는지 확인하고, 빠져 있다면 IDLE이 포함되도록 설치 구성을 바꿔 주세요. 구체적인 화면은 설치 방식에 따라 다르니, 회사 PC라면 IT 담당자에게 물어보는 것이 가장 빠릅니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">오늘의 미션</h2>
+
+<p style="font-size:16px;"><code>hello.py</code>를 열어 세 가지를 해 보세요. 고친 뒤에는 저장하고 다시 F5를 누르면 됩니다.</p>
+
+<ul style="font-size:16px;">
+<li>첫 줄의 글자를 <b>내 이름이 들어간 인사</b>로 바꿔 보세요.</li>
+<li>세 번째 줄을 <code>print(4500 * 20)</code>으로 바꿔 보세요. 커피 한 잔 4,500원을 20일 동안 마시면 얼마인지 계산한 거예요. 결과는 <b>90000</b>이 나옵니다.</li>
+<li>일부러 첫 줄의 닫는 따옴표를 지우고 실행해 보세요. 위에서 본 오류 메시지가 나오는지 확인해 보는 거예요. 오류를 한 번 만나 보면 다음에 덜 놀랍니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">첫 줄이 돌아갔다면 준비는 끝입니다</h2>
+
+<p style="font-size:16px;">설치하고, 코드를 쓰고, 저장하고, 실행하는 흐름. 앞으로 모든 편이 이 순서로 움직입니다. 오늘 해 본 것이 그 전부예요.</p>
+
+<p style="font-size:16px;">다음 1편에서는 <b>보고서 파일 이름에 오늘 날짜를 자동으로 넣는</b> 코드를 만들어 봅니다. 매번 날짜를 고쳐 쓰던 번거로움이 사라지는 첫 번째 업무예요.</p>
+
+<p style="font-size:16px;">(링크 자리: 1편 발행 후 링크로 교체)</p>

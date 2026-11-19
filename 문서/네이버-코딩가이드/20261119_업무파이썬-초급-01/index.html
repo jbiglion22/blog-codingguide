@@ -1,0 +1,199 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [업무 파이썬 초급 #1] 보고서 이름에 날짜 자동 입력
+독자: 코딩을 해 본 적 없는 직장인(사무직·프리랜서·자영업). 윈도우 PC 기준. 0편에서 파이썬과 IDLE을 설치하고 hello.py를 실행해 본 사람.
+검색 설명: 업무 파이썬 초급 연재 1편. 파이썬으로 오늘 날짜를 알아내 월간보고서_2026-11-19.xlsx 또는 월간보고서_20261119.xlsx 같은 파일 이름을 자동으로 만든다. 날짜 가져오기, 이름표(변수), 글자 끼워 넣기, 날짜 모양 바꾸기까지 코딩이 처음인 직장인 눈높이로 풀었고, 파일 이름에 쓸 수 없는 문자와 자주 나는 오류도 함께 정리했다.
+카테고리: 파이썬 코딩
+태그: #파이썬 #파이썬기초 #파이썬초보 #업무자동화 #직장인 #파일이름 #날짜자동입력 #엑셀자동화 #파이썬날짜 #strftime
+글자 수: 본문 공백 포함 3,767자 / 공백 제외 3,014자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.19)
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 「초보도 업무에서 바로 쓰는 파이썬」 초급 1편(목차·규칙은 저장소 루트 '네이버-코딩가이드-업무파이썬-연재.md'). 이전 편: 초급 0편 「파이썬 설치하고 첫 글자 띄우기」.
+발행 시점: 0편 발행 뒤 이틀쯤 뒤(주 2편 권장).
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 없앴다(사용자 요청, 2026-11-19). 0편 링크가 필요하면 발행할 때 직접 넣는다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT 요청, 1:1)
+02-월말-책상.png (ChatGPT 요청, 3:2 실사)
+03-이름-비교.png (AI, 4:5)
+04-이름표와-조립.png (AI, 4:5)
+05-날짜-모양-표.png (AI, 4:5)
+06-실행-결과.png (AI, 4:5, 이 PC에서 실행한 실제 출력으로 그림)
+07-안-될-때.png (AI, 4:5, 실제 오류 메시지)
+
+[근거 — 공식 문서 확인] 2026년 11월 19일
+- 「datetime — Basic date and time types」 https://docs.python.org/3/library/datetime.html : date.today()는 '현재 지역(local) 날짜'를 돌려줌, strftime 서식 코드 %Y(네 자리 연도)·%m(0을 채운 월)·%d(0을 채운 일)·%y(두 자리 연도).
+- 「Naming Files, Paths, and Namespaces」(Microsoft Learn) https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file : 파일 이름에 쓸 수 없는 예약 문자 < > : " / \ | ? * (그 밖에 파일 시스템이 허용하지 않는 문자도 있음).
+- 코드 확인(2026.11.19, 윈도우 11·Python 3.14.5): 본문 코드와 미션 코드를 모두 실행. 결과: 2026-11-19 / 월간보고서_2026-11-19.xlsx / 월간보고서_20261119.xlsx / 주간보고서_2026-11-19.xlsx / [영업팀] 월간보고서_20261119.xlsx / 261119 / 2026/11/19. 오류 메시지 4종도 실제로 낸 것(ImportError: cannot import name 'Date' from 'datetime' … Did you mean: 'date'? / NameError: name 'today' is not defined / 따옴표 닫기 빠진 f-string의 SyntaxError: unterminated f-string literal (detected at line 5) / f를 빼면 '{name}_{stamp}.xlsx'가 그대로 출력). 날짜 숫자는 실행한 날(2026.11.19) 기준이고 독자 PC에서는 그날 날짜로 나온다. 최신 3.15에서는 확인하지 않았고 오류 문구는 버전에 따라 조금 다를 수 있음.
+- [2026.11.19 외부 검수 반영(네 가지 모두 타당)] ① 검색 설명에 두 날짜 형식(2026-11-19 / 20261119) 모두 ② 출력 예시마다 '실행한 컴퓨터의 날짜가 2026년 11월 19일이라면' 조건 명시 ③ 파일 이름의 점(.): MS 문서 'Do not end a file or directory name with a space or a period'를 확인해 '이름 중간의 점은 가능, 맨 끝에 점·공백은 금지'로 보완(문서에 '첫 글자가 점인 이름은 허용'도 있으나 본문에는 넣지 않음) ④ f-string: '문자열을 감싼 따옴표 바로 앞에 f를 붙이지 않은 경우'. 이미지 07의 해당 문구도 고침.
+- 이 글은 파일을 만들거나 이름을 바꾸지 않고 '이름 글자'만 만들어 화면에 보여 준다(실제 파일 이름 바꾸기는 3편).
+-->
+
+<p style="font-size:16px;">월간 보고서를 저장할 때마다 파일 이름 끝에 날짜를 손으로 붙인다고 해 볼게요. 어느 달은 '1119'로 쓰고, 어느 달은 '11-19'로 쓰고, 어느 달은 아예 빼먹습니다.</p>
+
+<p style="font-size:16px;">오늘은 이 이름을 파이썬이 대신 짓게 만들어 봅니다. 코드는 몇 줄이면 됩니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">「초보도 업무에서 바로 쓰는 파이썬」 초급 1편입니다. 지난 0편에서 만든 <b>파이썬연습</b> 폴더와 IDLE을 그대로 씁니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이런 상황이라면</h2>
+
+<p style="font-size:16px;">매달 말에 같은 보고서를 새로 저장해야 하는 일이 있습니다. 이름에 날짜를 넣는 건 사소해 보이지만, 사람이 하면 자꾸 흔들려요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 월말 책상 (02-월말-책상.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li>날짜를 빼먹거나 틀리게 써서, 어느 파일이 최신인지 헷갈립니다.</li>
+<li>'1119', '11-19', '2026.11.19'처럼 파일마다 날짜 모양이 제각각이 됩니다.</li>
+<li>같은 이름으로 저장하면 이전 파일을 덮어써 버릴 수 있어요.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">결과부터 보기</h2>
+
+<p style="font-size:16px;">코드를 실행하면 아래처럼 <b>오늘 날짜가 들어간 파일 이름</b>이 화면에 나옵니다. 숫자는 실행한 날짜에 따라 달라져요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이름 비교 (03-이름-비교.png) ]]</p>
+
+<p style="font-size:16px;">이번 글에서는 이름 글자를 <b>만들어서 화면에 보여 주는 것</b>까지만 합니다. 실제 파일 이름을 바꾸는 건 3편에서 해요. 먼저 이름을 정확히 만드는 연습부터입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">1단계: 오늘 날짜를 파이썬에게 물어보기</h2>
+
+<p style="font-size:16px;">IDLE에서 <b>File → New File</b>로 빈 창을 열고, 아래 네 줄을 입력해 보세요. 저장하지 않고 바로 F5를 눌러도 되지만, 저장 이름을 물어보면 <b>파이썬연습</b> 폴더에 저장하면 됩니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from datetime import date
+
+today = date.today()
+print(today)</code></pre>
+
+<p style="font-size:16px;">실행하면 컴퓨터의 오늘 날짜가 나옵니다. 실행한 컴퓨터의 날짜가 2026년 11월 19일이라면 이렇게 나와요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>2026-11-19</code></pre>
+
+<p style="font-size:16px;">한 줄씩 풀어 볼게요.</p>
+
+<ul style="font-size:16px;">
+<li><code>from datetime import date</code> — 파이썬에는 날짜를 다루는 도구가 들어 있습니다. 그 도구 상자(<code>datetime</code>)에서 <code>date</code>라는 도구를 꺼내 온다는 뜻이에요. 프로그램 맨 위에 한 번만 쓰면 됩니다.</li>
+<li><code>today = date.today()</code> — 오늘 날짜를 알아내서 <b>today라는 이름표를 붙입니다.</b> 이렇게 값에 이름표를 붙인 것을 <b>변수</b>라고 불러요. 여기서 <code>=</code>는 '같다'가 아니라 <b>'넣는다'</b>는 뜻입니다.</li>
+<li><code>print(today)</code> — 이름표 today가 가리키는 값을 화면에 보여 줍니다.</li>
+</ul>
+
+<p style="font-size:16px;">날짜는 <b>이 컴퓨터의 시계</b>를 기준으로 나옵니다. 컴퓨터 시계가 틀려 있으면 날짜도 틀리게 나와요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">2단계: 파일 이름 조립하기</h2>
+
+<p style="font-size:16px;">이제 보고서 이름과 날짜를 이어 붙여 봅니다. 앞의 코드를 아래처럼 바꿔 주세요. 컴퓨터의 날짜가 2026년 11월 19일이라면, 결과는 코드 바로 아래 같은 모양으로 나옵니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from datetime import date
+
+name = "월간보고서"
+today = date.today()
+file_name = f"{name}_{today}.xlsx"
+print(file_name)</code></pre>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>월간보고서_2026-11-19.xlsx</code></pre>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이름표와 조립 (04-이름표와-조립.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><code>name = "월간보고서"</code> — 글자에도 이름표를 붙일 수 있어요. 글자는 <b>따옴표</b>로 감쌉니다.</li>
+<li><code>f"{name}_{today}.xlsx"</code> — 따옴표 앞의 <b>f</b>가 핵심입니다. 중괄호 <code>{ }</code> 안에 이름표를 쓰면 그 자리에 <b>값이 끼워 들어가요</b>. 중괄호 밖의 <code>_</code>와 <code>.xlsx</code>는 글자 그대로 나옵니다. <code>.xlsx</code>는 엑셀 파일을 뜻하는 끝 표시예요.</li>
+<li><code>file_name</code> — 완성된 이름에도 이름표를 붙였습니다. 다음 편들에서 이 이름표를 다시 쓸 거예요.</li>
+</ul>
+
+<p style="font-size:16px;">여기까지는 <b>이름 글자를 만든 것</b>일 뿐, 파일이 생기지는 않았습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">3단계: 날짜 모양 바꾸기</h2>
+
+<p style="font-size:16px;">지금은 날짜가 <b>2026-11-19</b>처럼 하이픈(-)으로 이어져 나옵니다. 회사에서 <b>20261119</b>처럼 붙여 쓰자고 정했다면요? 날짜를 원하는 모양의 글자로 바꿔 주는 기능이 있습니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>stamp = today.strftime("%Y%m%d")</code></pre>
+
+<p style="font-size:16px;"><code>strftime</code> 괄호 안의 글자는 '날짜를 이런 모양으로 써 줘'라는 주문서예요. 파이썬 공식 문서에 나온 글자 몇 개만 알면 됩니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>%Y</b> — 네 자리 연도 (2026)</li>
+<li><b>%m</b> — 두 자리 월 (11)</li>
+<li><b>%d</b> — 두 자리 일 (19)</li>
+<li><b>%y</b> — 두 자리 연도 (26). 대문자 Y와 소문자 y는 다릅니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 날짜 모양 표 (05-날짜-모양-표.png) ]]</p>
+
+<p style="font-size:16px;">주문서 글자 사이에 넣은 하이픈이나 점은 그대로 나옵니다. <code>"%Y-%m-%d"</code>는 2026-11-19, <code>"%y%m%d"</code>는 261119가 돼요.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">파일 이름에 쓸 수 없는 글자</h3>
+
+<p style="font-size:16px;">날짜 사이에 슬래시(/)를 넣어 <code>"%Y/%m/%d"</code>로 쓰면 날짜는 2026/11/19로 나옵니다. 하지만 이 글자는 <b>파일 이름으로 쓸 수 없어요.</b> 마이크로소프트 공식 문서에 따르면 윈도우 파일 이름에는 다음 글자를 쓸 수 없습니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>&lt;  &gt;  :  "  /  \  |  ?  *</code></pre>
+
+<p style="font-size:16px;">날짜 사이에는 하이픈(-)이나 밑줄(_)을 쓰거나, 아무것도 넣지 않는 방식이 무난합니다. 점(.)도 이름 중간에는 쓸 수 있지만, 마이크로소프트 공식 문서는 파일 이름의 <b>맨 끝에 점이나 공백을 두지 말라</b>고 안내합니다. 이 글의 이름은 .xlsx로 끝나서 걱정하지 않아도 됩니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">전체 코드 실행하기</h2>
+
+<p style="font-size:16px;">지금까지 배운 것을 모아 완성해 봅니다. IDLE에서 새 파일을 열고 아래 코드를 입력한 뒤, <b>파이썬연습</b> 폴더에 <b>report_name.py</b>라는 이름으로 저장하세요. 그다음 <b>F5</b>를 누릅니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from datetime import date
+
+name = "월간보고서"
+today = date.today()
+stamp = today.strftime("%Y%m%d")
+
+file_name = f"{name}_{stamp}.xlsx"
+print(file_name)</code></pre>
+
+<p style="font-size:16px;">2026년 11월 19일에 실행하면 이렇게 나옵니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (06-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">다음 달에 실행하면 이름의 날짜 부분이 저절로 바뀝니다. 코드는 한 글자도 고치지 않았는데도요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<p style="font-size:16px;">0편에서 말씀드린 것처럼 오류 메시지는 <b>맨 아랫줄</b>이 핵심입니다. 이번 글에서 자주 만날 실수 네 가지예요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 (07-안-될-때.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><code>ImportError: cannot import name 'Date' from 'datetime'</code> — <code>date</code>를 대문자 D로 썼어요. 메시지 끝에 <b>Did you mean: 'date'?</b>(혹시 date를 말씀하신 건가요?)라고 파이썬이 알려 줍니다. 이런 제안은 믿어 봐도 좋아요.</li>
+<li><code>NameError: name 'today' is not defined</code> — today를 만들기 전에 썼거나, 이름표를 다르게 썼습니다. <code>today</code>와 <code>tody</code>는 파이썬에게 완전히 다른 이름이에요.</li>
+<li><b>결과에 <code>{name}_{stamp}.xlsx</code>가 그대로 나올 때</b> — 오류는 아니지만, 문자열을 감싼 따옴표 <b>바로 앞에 f를 붙이지 않은</b> 경우입니다. f가 붙어 있어야 중괄호 안에 값이 들어가요.</li>
+<li><code>SyntaxError: unterminated f-string literal</code> — 글자를 감싼 닫는 따옴표가 빠졌습니다. 0편에서 본 따옴표 실수와 같아요.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">오늘의 미션</h2>
+
+<p style="font-size:16px;">완성한 코드를 조금씩 바꿔 보세요. 결과는 2026년 11월 19일에 실행했을 때의 모양입니다.</p>
+
+<ul style="font-size:16px;">
+<li><code>name</code>을 <b>"주간보고서"</b>로 바꾸고, 날짜 모양을 <code>"%Y-%m-%d"</code>로 바꿔 보세요. → <b>주간보고서_2026-11-19.xlsx</b></li>
+<li><code>team = "영업팀"</code> 줄을 새로 만들고, 이름을 <code>f"[{team}] {name}_{stamp}.xlsx"</code>로 바꿔 보세요. → <b>[영업팀] 월간보고서_20261119.xlsx</b></li>
+<li>마지막 줄을 <code>print(today.strftime("%y%m%d"))</code>로 바꿔 보세요. 연도가 두 자리로 나오는지 확인해 보는 거예요. → <b>261119</b></li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다음 달 이름은 고치지 않아도 됩니다</h2>
+
+<p style="font-size:16px;">오늘 배운 것은 크게 세 가지입니다. 날짜를 가져오고, 값에 이름표를 붙이고, 글자를 끼워 넣어 이름을 조립하는 것. 이 세 가지는 앞으로 거의 모든 편에서 다시 나옵니다.</p>
+
+<p style="font-size:16px;">다음 2편에서는 <b>폴더 속 파일 이름을 한눈에 뽑아 보는</b> 코드를 만듭니다. 파일이 100개여도 목록으로 한꺼번에 보는 방법이에요.</p>
