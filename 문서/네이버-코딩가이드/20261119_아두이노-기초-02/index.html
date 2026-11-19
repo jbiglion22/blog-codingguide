@@ -1,0 +1,218 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [아두이노 기초 #2] 프로그램 설치하고 첫 LED 깜빡이기
+독자: 초등학생~중학생과 지도하는 학부모·선생님. 독자는 자기 아두이노(실물)로 따라 한다. 안내 캐릭터 '두이'(인사·꿀팁·미션·예고).
+검색 설명: 아두이노 기초 연재 2편. 아두이노 IDE 2를 설치하고, 우노 보드를 연결해 보드와 포트를 고르고, 첫 코드로 보드의 내장 LED를 1초마다 깜빡여 본다. setup()과 loop()의 뜻, 확인(체크)과 업로드(화살표) 버튼, 시리얼 모니터로 글자 보기, 업로드가 안 될 때 확인할 것까지 초·중학생 눈높이로 정리했다.
+카테고리: 아두이노 라즈베리파이
+태그: #아두이노 #아두이노기초 #아두이노IDE #아두이노설치 #아두이노업로드 #Blink #LED깜빡이기 #시리얼모니터 #초등코딩 #중학생코딩
+글자 수: 본문 공백 포함 4,448자 / 공백 제외 3,478자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.19)
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 네이버 아두이노 연재 기초 2편(목차·규칙은 저장소 루트 '네이버-코딩가이드-아두이노-연재.md'). 이전 편: 기초 1편 「아두이노가 뭘까, 무엇을 준비할까」.
+발행 시점: 1편 발행 일주일 뒤 권장.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 기초 1편 링크로 바꾼다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT 요청, 1:1, 두이)
+02-이번-편에서-만들-것.png (ChatGPT 요청, 3D 카툰, 4:5, 두이)
+03-설치-순서.png (AI, 4:5)
+04-IDE-화면-읽기.png (AI, 공식 문서 설명을 바탕으로 그린 화면 도식, 4:5)
+05-setup과-loop.png (ChatGPT 요청, 3D 카툰, 4:5, 두이)
+06-실행-결과.png (AI, 시뮬레이터에서 실행한 실제 출력으로 그린 결과 그림, 4:5 — 그림·본문에는 시뮬레이터 언급 없음)
+07-안-될-때.png (AI, 4:5)
+08-두이의-미션.png (AI, 1:1)
+09-함께-보면-좋은-글.png (공통 배너)
+
+[근거 — 공식 문서 확인] 2026년 11월 19일
+- 「Downloading and installing the Arduino IDE 2」 https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-downloading-and-installing/ : Arduino Software 페이지에서 내려받기, 요구 사양 Windows 10 이상 64비트·macOS 10.15 이상 64비트·Linux 64비트, 윈도우는 내려받은 파일을 실행하고 안내를 따름(몇 분 걸릴 수 있음), 맥은 내려받은 파일을 응용 프로그램 폴더로 복사.
+- 「How to upload a sketch with the Arduino IDE 2」 https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-uploading-a-sketch/ : 위쪽 도구 막대 맨 왼쪽 체크(확인=오류 검사·컴파일)와 오른쪽 화살표(업로드=컴파일 후 보드에 올림), 업로드 전에 확인을 먼저 하는 습관, 옆 드롭다운에서 보드 선택(연결되면 보드 이름이 굵게), 자동으로 안 잡히면 'Select other board and port...' 또는 Tools > Board, Tools > Port, 결과는 아래 검은 출력 창, 업로드가 끝나면 오른쪽 아래 알림.
+- 「Installing a Board Package in the IDE 2」 https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-board-manager/ : 왼쪽 세로 막대의 보드 아이콘(보드 매니저), 우노는 ATmega328P라 AVR 패키지, 검색 후 INSTALL, 끝나면 INSTALLED.
+- 「Blink」 https://docs.arduino.cc/built-in-examples/basics/Blink/ : 내장 LED는 LED_BUILTIN 상수, 우노는 D13, pinMode(LED_BUILTIN, OUTPUT), digitalWrite HIGH=5V로 켜짐·LOW=0V로 꺼짐, delay(1000)=1000밀리초=1초 동안 아무것도 안 함, File > Examples > 01.Basics > Blink 로도 열 수 있음.
+- 「Using the Serial Monitor tool」 https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-serial-monitor/ : Serial.begin(9600)으로 통신 속도(보드레이트) 9600, 업로드 후 오른쪽 위의 Serial Monitor 버튼, IDE 아래쪽(출력 창 자리)에 탭으로 열림, 보드레이트 설정도 여기서.
+- [2026.11.19 외부 검수 반영(일곱 가지)] ① '진짜 보드에서도 똑같이 동작' → '바르게 연결·업로드했다면 같은 방식으로 동작'(실물 미확인) ② 안 될 때를 '컴퓨터가 보드를 못 알아봄'과 '목록에서 고르기'로 나누고 윈도우 장치 관리자 포트(COM & LPT) 확인 추가 ③ 보드 패키지는 이미 INSTALLED면 그대로, USB 드라이버와 다른 것 ④ 체크 버튼은 '컴파일되는지 확인'(문법 실수는 찾지만 원하는 동작까지는 아님) ⑤ HIGH는 'HIGH(켜짐) 신호, 우노에서 보통 약 5V' ⑥ 한글 출력은 실물 미확인이라 '깨지면 속도 확인 후 영어로 바꿔 보기' 꿀팁 ⑦ 미션 '심장 박동' → '깜빡임 리듬'. 그림 04·07·08 문구도 고침.
+- 일반 지식으로 쓴 것(발행 메모 표시): 윈도우 장치 관리자의 '포트(COM & LPT)', 보드 패키지 이름 'Arduino AVR Boards', 충전 전용 USB 케이블, 호환 보드는 판매처가 안내하는 USB 드라이버가 필요할 수 있다는 점, 세미콜론·괄호 오류, 학교 컴퓨터 설치 권한.
+- 사용자 결정(2026-11-19): '시뮬레이터로 만든 그림/결과'라는 안내는 본문·그림에서 빼고 이 메모에만 남긴다. 글쓴이에게 보드가 없다는 사실은 독자가 알 필요 없음, 대신 직접 해 본 것처럼 쓰지 않고 실물 결과를 단정하지 않는다.
+- 코드 확인(2026.11.19): 이 글의 코드를 Wokwi 시뮬레이터(가상 우노)에서 그대로 실행 → 시리얼 출력 '안녕, 나는 두이야!' 한 번 뒤 '불 켜짐'·'불 꺼짐'이 1초마다 번갈아(시뮬레이션 7.7초 동안 8줄), 보드 요소의 led13 값이 꺼짐↔켜짐으로 바뀜. 실물 보드로는 확인하지 못함. 한글 출력은 IDE 2 시리얼 모니터에서 보이는 것으로 알려져 있으나 실물로 확인하지 못함(글자가 깨지면 영어로 바꿔도 된다는 안내는 넣지 않음 — 추가 확인 필요). IDE 화면 그림은 공식 문서의 설명을 바탕으로 그린 도식이고 실제 화면 캡처가 아님.
+-->
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 안녕! 오늘은 드디어 코드를 써 볼 거야. 보드에 붙어 있는 작은 불빛을 내 안테나처럼 깜빡깜빡하게 만들어 보자!</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">'아두이노 기초' 연재 2편입니다. 지난 1편에서는 아두이노가 무엇인지, 우노 보드는 어떻게 생겼는지 알아봤어요.</p>
+
+<p style="font-size:16px;">이번 편에서는 아두이노 프로그램을 설치하고, 보드에 첫 코드를 넣어 <b>내장 LED를 1초마다 깜빡이게</b> 만들어 봅니다. 아두이노를 배우는 모든 사람이 가장 처음 해 보는, 말 그대로 첫걸음이에요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이번 편에서 만들 것</h2>
+
+<p style="font-size:16px;">보드 위 <b>L</b>이라고 적힌 작은 LED가 1초 켜지고, 1초 꺼지기를 계속 되풀이합니다. 그리고 컴퓨터 화면에는 아두이노가 보내는 글자가 한 줄씩 나타나요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이번 편에서 만들 것 (02-이번-편에서-만들-것.png) ]]</p>
+
+<p style="font-size:16px;"><b>준비물</b>: 우노 보드, USB 케이블, 컴퓨터. 이번 편은 다른 부품이 필요 없어요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">1단계: 아두이노 프로그램(IDE) 설치하기</h2>
+
+<p style="font-size:16px;">아두이노에 코드를 넣으려면 컴퓨터에 <b>아두이노 IDE</b>라는 프로그램이 있어야 합니다. 코드를 쓰고, 검사하고, 보드로 보내는 일을 모두 이 프로그램에서 해요.</p>
+
+<ul style="font-size:16px;">
+<li><b>내려받기</b>: 아두이노 공식 사이트(arduino.cc)의 Software 페이지에서 '아두이노 IDE 2'를 내려받습니다.</li>
+<li><b>윈도우</b>: 내려받은 설치 파일을 실행하고 안내를 따르면 됩니다. 몇 분 걸릴 수 있어요.</li>
+<li><b>맥</b>: 내려받은 파일을 '응용 프로그램' 폴더로 옮기면 됩니다.</li>
+<li><b>필요한 컴퓨터</b>: 윈도우 10 이상(64비트), 맥 OS 10.15 이상 등입니다. 아주 오래된 컴퓨터는 안 될 수 있어요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 설치 순서 (03-설치-순서.png) ]]</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 학교나 공용 컴퓨터는 프로그램을 마음대로 설치할 수 없게 막혀 있을 때가 많아. 그럴 땐 선생님께 먼저 여쭤봐!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">2단계: 보드를 연결하고 고르기</h2>
+
+<p style="font-size:16px;">USB 케이블로 우노와 컴퓨터를 연결하고 IDE를 엽니다. 처음 보는 화면이지만, 지금은 몇 곳만 알면 돼요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: IDE 화면 읽기 (04-IDE-화면-읽기.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><b>체크(✓) 버튼</b>: 내 코드가 아두이노가 알아듣는 말로 바뀌는지(<b>컴파일</b>되는지) <b>확인</b>하는 버튼입니다. 쉼표나 괄호 같은 문법 실수는 찾아 주지만, 내가 원한 대로 움직일지까지 알려 주지는 않아요.</li>
+<li><b>화살표(→) 버튼</b>: 확인한 다음 보드로 코드를 <b>보내는(업로드)</b> 버튼입니다.</li>
+<li><b>보드 고르는 칸</b>: 버튼 옆에 있어요. 연결한 보드를 여기서 고릅니다.</li>
+<li><b>아래 검은 창</b>: 확인과 업로드 결과가 글자로 나오는 곳입니다.</li>
+</ul>
+
+<p style="font-size:16px;">보드 고르는 칸을 눌러 우노를 고르세요. 제대로 연결되면 보드 이름이 <b>굵은 글씨</b>로 보입니다. 목록에 안 보이면 'Select other board and port...'를 누르거나, 위쪽 메뉴의 <b>Tools → Board</b>와 <b>Tools → Port</b>에서 직접 고르면 돼요.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">보드 패키지도 확인하기</h3>
+
+<p style="font-size:16px;">IDE가 우노를 다루려면 우노용 '보드 패키지'가 있어야 합니다. 왼쪽 세로 막대의 <b>보드 모양 아이콘(보드 매니저)</b>을 눌러 'Arduino AVR Boards'를 검색해 보세요.</p>
+
+<ul style="font-size:16px;">
+<li><b>INSTALLED</b>라고 보이면 이미 설치된 것이니 그대로 두면 됩니다.</li>
+<li>설치돼 있지 않으면 <b>INSTALL</b>을 누르세요. 다 되면 'INSTALLED'로 바뀝니다.</li>
+</ul>
+
+<p style="font-size:16px;">보드 패키지는 IDE 안에 넣는 '우노 사용 설명서' 같은 것이고, 컴퓨터가 보드를 알아보게 하는 <b>USB 드라이버</b>와는 다른 것입니다. 드라이버 이야기는 아래 '안 될 때'에서 다룰게요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">3단계: 첫 코드 쓰기</h2>
+
+<p style="font-size:16px;">IDE의 빈 화면에 아래 코드를 그대로 따라 쓰세요. <code>//</code> 뒤의 글은 사람이 읽으라고 적은 '메모(주석)'라서, 안 써도 동작은 같아요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>// 두이의 첫 번째 코드: 내장 LED 깜빡이기
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);   // 내장 LED 핀을 '출력'으로 쓰겠다고 알려 주기
+  Serial.begin(9600);             // 컴퓨터와 이야기할 준비 (속도 9600)
+  Serial.println("안녕, 나는 두이야!");
+}
+
+void loop() {
+  digitalWrite(LED_BUILTIN, HIGH);  // 불 켜기
+  Serial.println("불 켜짐");
+  delay(1000);                      // 1초 기다리기
+  digitalWrite(LED_BUILTIN, LOW);   // 불 끄기
+  Serial.println("불 꺼짐");
+  delay(1000);                      // 1초 기다리기
+}</code></pre>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">setup()과 loop(), 두 칸의 비밀</h3>
+
+<p style="font-size:16px;">아두이노 코드는 항상 두 칸으로 나뉩니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>setup()</b>: 전원이 켜지면 <b>딱 한 번</b> 하는 일. 아침에 일어나서 가방을 챙기는 '준비'와 같아요.</li>
+<li><b>loop()</b>: 그다음부터 <b>끝없이 되풀이</b>하는 일. 매일 반복하는 '하루 일과'와 같아요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: setup과 loop (05-setup과-loop.png) ]]</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">한 줄씩 풀어 보기</h3>
+
+<ul style="font-size:16px;">
+<li><code>pinMode(LED_BUILTIN, OUTPUT);</code> — 내장 LED가 연결된 핀을 '출력'으로 쓰겠다는 약속입니다. 우노에서는 <b>LED_BUILTIN이 13번 핀</b>이에요.</li>
+<li><code>Serial.begin(9600);</code> — 컴퓨터와 글자를 주고받을 준비를 합니다. 9600은 주고받는 속도예요.</li>
+<li><code>digitalWrite(LED_BUILTIN, HIGH);</code> — 핀으로 <b>HIGH(켜짐) 신호</b>를 보내 불을 켭니다. 우노에서 HIGH는 보통 약 5V예요. <b>LOW</b>로 바꾸면 신호를 끄고(0V) 불이 꺼져요.</li>
+<li><code>delay(1000);</code> — 1000밀리초, 즉 <b>1초 동안 기다립니다</b>. 기다리지 않으면 너무 빨리 켜졌다 꺼져서 눈으로 볼 수 없어요.</li>
+<li><code>Serial.println("불 켜짐");</code> — 컴퓨터 화면에 글자 한 줄을 보냅니다.</li>
+</ul>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 코드 줄 끝의 세미콜론(;)을 빼먹는 실수가 제일 많아! 그리고 IDE 메뉴의 File → Examples → 01.Basics → Blink 를 열면 비슷한 예제 코드를 바로 불러올 수도 있어.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">4단계: 확인하고 업로드하기</h2>
+
+<ul style="font-size:16px;">
+<li><b>먼저 체크(✓) 버튼</b>을 눌러 컴파일되는지 확인합니다. 문제가 없으면 아래 창에 확인이 끝났다는 글자가 나와요. 문법 실수가 있으면 빨간 글씨로 알려 줍니다.</li>
+<li>확인이 끝나면 <b>화살표(→) 버튼</b>을 눌러 업로드합니다.</li>
+<li>업로드가 끝나면 화면 <b>오른쪽 아래에 알림</b>이 뜹니다.</li>
+</ul>
+
+<p style="font-size:16px;">아두이노 공식 안내도 업로드 전에 확인부터 하는 습관을 권합니다. 틀린 곳을 미리 찾아 고칠 수 있기 때문이에요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">5단계: 결과 보기</h2>
+
+<p style="font-size:16px;">업로드가 끝나면 보드의 <b>L</b> LED가 1초마다 켜졌다 꺼졌다 합니다. 성공이에요!</p>
+
+<p style="font-size:16px;">이번에는 아두이노가 보낸 글자를 볼 차례입니다. IDE <b>오른쪽 위의 시리얼 모니터 버튼</b>을 누르면 아래쪽에 시리얼 모니터가 열려요. 속도를 코드와 같은 <b>9600</b>으로 맞추면 글자가 한 줄씩 나타납니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (06-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">처음에 "안녕, 나는 두이야!"가 한 번 나오고, 그 뒤로 "불 켜짐"과 "불 꺼짐"이 1초마다 번갈아 나옵니다. setup()은 한 번, loop()는 계속 되풀이된다는 걸 눈으로 확인할 수 있죠.</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 시리얼 모니터에 한글이 이상한 기호로 깨져 보이면, 먼저 속도(9600)를 확인하고, 그래도 깨지면 따옴표 안의 글자를 영어(예: "LED ON", "LED OFF")로 바꿔 봐. 컴퓨터 환경에 따라 한글이 잘 안 보일 때가 있거든.</p>
+
+<p style="font-size:16px;">※ 우노를 바르게 연결하고 업로드했다면 그림처럼 동작합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<ul style="font-size:16px;">
+<li><b>컴퓨터가 보드를 못 알아봐요(목록에 아무것도 없어요)</b> → USB 케이블이 데이터도 보내는 케이블인지 확인하고(충전 전용 케이블은 안 돼요), 다른 USB 구멍에도 꽂아 보세요. 윈도우라면 <b>장치 관리자</b>의 '포트(COM & LPT)'에 보드를 꽂을 때 새 항목이 생기는지 보면 컴퓨터가 알아봤는지 알 수 있어요. 호환 보드라면 판매처가 안내하는 USB 드라이버를 설치해야 할 수 있습니다.</li>
+<li><b>목록에는 있는데 고르기가 헷갈려요</b> → 'Select other board and port...'나 Tools → Board, Tools → Port에서 우노와 그 포트를 직접 고르세요.</li>
+<li><b>업로드하다 오류가 나요</b> → 보드와 포트를 다시 골라 보세요. 다른 프로그램이 보드를 쓰고 있지 않은지도 확인해요.</li>
+<li><b>빨간 글씨 오류가 나요</b> → 세미콜론(;), 괄호 ( ) { }, 따옴표(" ")를 빠뜨리지 않았는지, 대소문자가 맞는지(pinMode, digitalWrite) 확인하세요.</li>
+<li><b>시리얼 모니터 글자가 이상해요</b> → 속도를 9600으로 맞췄는지 확인하고, 한글이 깨지면 영어로 바꿔 보세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 확인할 것 (07-안-될-때.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다음 편: 진짜 LED를 브레드보드에 꽂아 보자</h2>
+
+<p style="font-size:16px;"><b>🎯 두이의 미션</b></p>
+
+<ul style="font-size:16px;">
+<li><b>빨리 깜빡이기</b>: delay(1000)을 두 군데 모두 delay(200)으로 바꿔 보기</li>
+<li><b>깜빡임 리듬 만들기</b>: 켜진 시간은 짧게(100), 꺼진 시간은 길게(800) 바꿔 보기</li>
+<li><b>내 인사말</b>: "안녕, 나는 두이야!"를 내 이름이 들어간 인사로 바꿔 보기</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두이의 미션 (08-두이의-미션.png) ]]</p>
+
+<p style="font-size:16px;">다음 편에서는 키트의 LED와 저항을 브레드보드에 꽂아, 보드 밖에 있는 진짜 LED를 켜 봅니다. 저항이 왜 꼭 필요한지도 알아봐요.</p>
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 미션 성공했어? 다음엔 더 큰 불빛을 켜 보자. 브레드보드랑 LED, 저항을 미리 꺼내 둬!</p>
+
+<p style="font-size:16px;"><b>👩‍🏫 학부모·선생님께</b></p>
+
+<ul style="font-size:16px;">
+<li>IDE 설치에는 컴퓨터 관리자 권한이 필요할 수 있습니다. 학교 컴퓨터는 학교 정책을 먼저 확인해 주세요.</li>
+<li>이번 편은 USB 전원만 쓰는 실습이라 별도의 전원이나 부품이 필요 없습니다.</li>
+<li>코드를 그대로 따라 쓰게 한 뒤, 미션처럼 숫자를 바꿔 보게 하면 '코드를 고치면 결과가 바뀐다'는 감각을 익히기 좋습니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (09-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">(링크 자리) [아두이노 기초 #1] 아두이노가 뭘까, 무엇을 준비할까</p>
