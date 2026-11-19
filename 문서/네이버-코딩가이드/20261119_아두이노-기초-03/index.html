@@ -1,0 +1,212 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [아두이노 기초 #3] 브레드보드에 LED 꽂기, 저항은 왜 필요할까
+독자: 초등학생~중학생과 지도하는 학부모·선생님. 독자는 자기 아두이노(실물)로 따라 한다. 안내 캐릭터 '두이'(인사·꿀팁·미션·예고).
+검색 설명: 아두이노 기초 연재 3편. 브레드보드 안이 어떻게 이어져 있는지, LED의 긴 다리와 짧은 다리, 저항이 왜 꼭 필요한지(우노 핀 하나에 20mA)를 쉽게 풀고, 13번 핀에 220Ω 저항과 LED를 연결해 깜빡여 본다. 핀 번호에 이름을 붙이는 변수, 안 될 때 확인할 것까지 초·중학생 눈높이로 정리했다.
+카테고리: 아두이노 라즈베리파이
+태그: #아두이노 #아두이노기초 #브레드보드 #LED #저항 #220옴 #옴의법칙 #아두이노회로 #초등코딩 #중학생코딩
+글자 수: 본문 공백 포함 3,860자 / 공백 제외 2,969자 (코드 포함, 빨간 이미지 표시 제외)
+- 2026-11-19 외부 검수 반영(일곱 가지 모두): 20mA는 '공식 사양에 I/O 핀당 20mA로 안내'(절대 한계처럼 쓰지 않음), 14mA는 '순방향 전압 약 2V 가정한 이론값', 저항 없으면 LED뿐 아니라 핀도 손상·저항은 직렬로, 브레드보드는 '일반적으로 홈 양쪽 5구멍씩 한 묶음, 제품마다 다를 수 있음'(방향 표현 '세로' 삭제), '전류가 흐르는 경로', L LED는 '우노 R3 기준·호환 보드는 다를 수 있음', 어두울 때 LED 방향 → 색 띠 → 꽂은 줄 순서. 그림 03·06·08 문구도 고침.
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 네이버 아두이노 연재 기초 3편(목차·규칙은 저장소 루트 '네이버-코딩가이드-아두이노-연재.md'). 이전 편: 기초 2편 「프로그램 설치하고 첫 LED 깜빡이기」.
+발행 시점: 2편 발행 일주일 뒤 권장.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 기초 2편 링크로 바꾼다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT 요청, 1:1, 두이)
+02-이번-편에서-만들-것.png (ChatGPT 요청, 4:5, 두이)
+03-브레드보드-속.png (AI, 4:5)
+04-LED-다리.png (AI, 1:1)
+05-저항은-수도관.png (ChatGPT 요청, 4:5, 두이)
+06-배선도.png (AI, 4:5)
+07-실행-결과.png (AI, 4:5)
+08-안-될-때.png (AI, 4:5)
+09-두이의-미션.png (AI, 1:1)
+10-함께-보면-좋은-글.png (공통 배너)
+
+[근거 — 공식 문서 확인] 2026년 11월 19일
+- 「UNO R3」 Tech Specs https://docs.arduino.cc/hardware/uno-rev3/ : Built-in LED Pin 13, I/O Voltage 5V, DC Current per I/O Pin 20 mA, USB-B.
+- 「Blink」 https://docs.arduino.cc/built-in-examples/basics/Blink/ : 바깥 LED는 저항 한쪽을 LED_BUILTIN 핀(우노 D13)에, LED 긴 다리(+, 애노드)를 저항 다른 쪽에, 짧은 다리(-, 캐소드)를 GND에. 저항은 LED에 흐르는 전류를 제한해 LED와 아두이노 출력 핀이 망가지지 않게 하는 데 꼭 필요, 옴의 법칙(V=IR), 보드 전압(5V)에서 LED의 순방향 전압(빨강은 보통 1.8~2.2V)을 뺀 값으로 계산, 우노 R3(5V)에서 220Ω이면 안전한 수준, 5V 보드에서는 1kΩ까지도 LED가 보임.
+- 직접 계산: (5V − 2V) ÷ 220Ω ≈ 0.0136A ≈ 약 14mA(우노 핀 하나 20mA보다 작음). 빨강 LED 순방향 전압은 공식 문서의 1.8~2.2V 중 2V로 어림.
+- 일반 지식으로 쓴 것(발행 메모 표시): 브레드보드 구조(가운데 세로 5칸씩 한 줄로 이어짐, 가운데 홈 양쪽은 끊김, 가장자리 +/- 전원 줄은 길게 이어짐), LED 짧은 다리 쪽 테두리가 평평함, 220Ω 저항 색띠(4색띠: 빨강·빨강·갈색·금), 저항은 방향이 없음, 수도관 비유, 저항 없이 꽂으면 LED·핀이 망가질 수 있다는 설명(공식 문서의 '전류 제한' 설명에 근거한 풀이).
+- 코드·회로 확인: 13번 핀 → 220Ω 저항 → LED 애노드, LED 캐소드 → GND 회로와 이 글의 코드를 Wokwi 시뮬레이터에서 실행해 확인(실물 보드로는 확인하지 못함). 사용자 결정(2026-11-19)으로 본문·그림에는 시뮬레이터 언급 없음.
+-->
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 안녕! 지난번엔 보드에 원래 붙어 있는 작은 불을 켰지? 오늘은 진짜 LED를 내 손으로 꽂아서 켜 볼 거야!</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">'아두이노 기초' 연재 3편입니다. 지난 2편에서는 프로그램을 설치하고 보드의 내장 LED를 깜빡였어요.</p>
+
+<p style="font-size:16px;">이번에는 키트의 <b>브레드보드</b>에 <b>LED와 저항</b>을 꽂아 처음으로 회로를 만들어 봅니다. 그리고 "저항은 왜 꼭 끼워야 하지?"라는 궁금증도 풀어 볼게요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이번 편에서 만들 것</h2>
+
+<p style="font-size:16px;">브레드보드에 꽂은 빨간 LED가 0.5초마다 켜졌다 꺼졌다 합니다. 우노 R3는 보드의 작은 L LED가 13번 핀에 이어져 있어서, L LED도 함께 깜빡여요(다른 호환 보드는 다를 수 있어요).</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이번 편에서 만들 것 (02-이번-편에서-만들-것.png) ]]</p>
+
+<p style="font-size:16px;"><b>준비물</b>: 우노 보드, USB 케이블, 브레드보드, 빨간 LED 1개, 220Ω 저항 1개, 점퍼선 2개</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">브레드보드 속은 어떻게 이어져 있을까</h2>
+
+<p style="font-size:16px;">브레드보드는 구멍이 잔뜩 뚫린 하얀 판입니다. 납땜 없이 부품을 꽂기만 하면 회로를 만들 수 있어요. 겉으로는 구멍만 보이지만, 안쪽에는 금속판이 숨어 있어서 <b>정해진 구멍끼리 전기가 통합니다</b>.</p>
+
+<ul style="font-size:16px;">
+<li><b>가운데 부분</b>: 일반적인 브레드보드는 가운데 홈을 기준으로 양쪽에 <b>5개 구멍씩 한 묶음</b>으로 이어져 있습니다. 같은 묶음에 꽂은 부품끼리는 전선 없이도 연결돼요.</li>
+<li><b>가운데 홈</b>: 홈을 사이에 둔 양쪽 묶음은 서로 <b>끊겨</b> 있습니다.</li>
+<li><b>가장자리의 +, - 줄</b>: 길게 이어져 있어서 전원(+)과 GND(-)를 나눠 쓰기 좋습니다.</li>
+</ul>
+
+<p style="font-size:16px;">제품에 따라 안쪽 연결 방향이나 전원 줄 모양이 조금씩 다를 수 있으니, 처음 쓰는 브레드보드라면 설명서나 겉에 그려진 선으로 연결 구조를 확인하세요. 판을 돌려 놓으면 묶음 방향도 같이 돌아가요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 브레드보드 속 (03-브레드보드-속.png) ]]</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 브레드보드에 따라 가장자리 전원 줄이 가운데쯤에서 끊긴 것도 있어. 줄 옆 빨간 선·파란 선이 중간에 끊겨 있으면 거기서 전기가 안 통한다는 표시야!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">LED는 방향이 있다</h2>
+
+<p style="font-size:16px;">LED는 거꾸로 꽂으면 켜지지 않습니다. 다리 두 개를 잘 보세요.</p>
+
+<ul style="font-size:16px;">
+<li><b>긴 다리 = +(플러스)</b>: 전기가 들어가는 쪽입니다. 핀 쪽(저항 쪽)에 연결해요.</li>
+<li><b>짧은 다리 = -(마이너스)</b>: 전기가 나가는 쪽입니다. GND에 연결해요.</li>
+<li>다리를 잘랐다면, LED 동그란 테두리에서 <b>평평하게 깎인 쪽</b>이 -입니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: LED 다리 구별하기 (04-LED-다리.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">저항은 왜 꼭 필요할까</h2>
+
+<p style="font-size:16px;">저항은 전기가 너무 많이 흐르지 않게 막아 주는 부품입니다. 물로 비유하면 <b>수도관 중간을 좁혀 물이 콸콸 쏟아지지 않게 하는 것</b>과 같아요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 저항은 좁은 수도관 (05-저항은-수도관.png) ]]</p>
+
+<p style="font-size:16px;">아두이노 공식 안내도 저항이 LED에 흐르는 전기(전류)를 줄여서 <b>LED와 아두이노 핀이 망가지지 않게</b> 해 준다며, 꼭 필요하다고 설명합니다. 저항 없이 꽂으면 전기가 너무 많이 흘러 LED뿐 아니라 <b>아두이노 핀까지</b> 망가질 수 있어요. 저항은 LED와 <b>한 길로 이어지게(직렬로)</b> 꽂아야 효과가 있습니다.</p>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">숫자로 확인해 보기</h3>
+
+<p style="font-size:16px;">우노 R3 공식 사양에는 I/O 핀 하나당 전류가 <b>20mA(밀리암페어)</b>로 안내되어 있습니다. 이 값을 넘지 않게 쓰는 것이 좋아요. 220Ω 저항을 끼우면 얼마나 흐를까요? 전압을 저항으로 나누면 전류가 나옵니다(옴의 법칙).</p>
+
+<ul style="font-size:16px;">
+<li>빨간 LED가 쓰는 전압(순방향 전압)을 <b>약 2V로 가정</b>합니다.</li>
+<li>핀 전압 5V에서 2V를 빼면 → 3V</li>
+<li>3V ÷ 220Ω ≈ 0.014A = <b>약 14mA</b></li>
+<li>14mA는 20mA보다 작아요.</li>
+</ul>
+
+<p style="font-size:16px;">이 숫자는 가정으로 계산한 이론값이라, 실제 전류는 LED와 저항에 따라 조금 달라집니다. 공식 안내에도 우노에서는 220Ω이면 LED와 핀 모두에 안전한 수준이라고 나와 있습니다. 저항을 더 크게(최대 1kΩ 정도) 하면 LED가 조금 어두워지지만 여전히 보여요.</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 저항은 몸에 그려진 색 띠로 크기를 알 수 있어. 220Ω은 보통 <b>빨강·빨강·갈색</b>(+금색) 띠야. 저항은 LED와 달리 방향이 없어서 어느 쪽으로 꽂아도 돼!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">회로 연결하기</h2>
+
+<p style="font-size:16px;"><b>USB 케이블을 뽑은 상태에서</b> 아래 순서대로 꽂으세요.</p>
+
+<ul style="font-size:16px;">
+<li><b>①</b> LED를 브레드보드에 꽂습니다. 긴 다리와 짧은 다리가 <b>서로 다른 줄</b>에 들어가게 해요.</li>
+<li><b>②</b> 저항의 한쪽 다리를 LED <b>긴 다리와 같은 줄</b>에, 다른 쪽 다리는 옆의 빈 줄에 꽂습니다.</li>
+<li><b>③</b> 점퍼선으로 보드의 <b>13번 핀</b>과 저항의 빈 쪽 줄을 잇습니다.</li>
+<li><b>④</b> 점퍼선으로 보드의 <b>GND</b>와 LED <b>짧은 다리 줄</b>을 잇습니다.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 배선도 (06-배선도.png) ]]</p>
+
+<p style="font-size:16px;">LED가 켜질 때 <b>전류가 흐르는 경로</b>는 <b>13번 핀 → 저항 → LED 긴 다리 → LED 짧은 다리 → GND</b>입니다. 이 길이 끊긴 곳 없이 이어져야 LED가 켜져요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">코드 쓰기</h2>
+
+<p style="font-size:16px;">2편 코드와 거의 같지만, 이번엔 핀 번호에 <b>이름</b>을 붙여 봤어요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>int ledPin = 13;   // LED를 꽂은 핀 번호에 '이름' 붙이기
+
+void setup() {
+  pinMode(ledPin, OUTPUT);   // ledPin(13번)을 출력으로 쓰기
+  Serial.begin(9600);
+  Serial.println("브레드보드 LED 준비 완료!");
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH);   // LED 켜기
+  Serial.println("LED 켜짐");
+  delay(500);                   // 0.5초 기다리기
+  digitalWrite(ledPin, LOW);    // LED 끄기
+  Serial.println("LED 꺼짐");
+  delay(500);                   // 0.5초 기다리기
+}</code></pre>
+
+<ul style="font-size:16px;">
+<li><code>int ledPin = 13;</code> — '13'이라는 숫자에 <b>ledPin</b>이라는 이름표를 붙였습니다. 이런 이름표를 <b>변수</b>라고 해요. <code>int</code>는 '정수(소수점 없는 수)를 담는다'는 뜻입니다.</li>
+<li>이름표를 쓰면 좋은 점: 나중에 LED를 8번 핀으로 옮겨도 <b>첫 줄의 숫자 하나만</b> 바꾸면 됩니다.</li>
+<li><code>delay(500);</code> — 500밀리초, 즉 0.5초 기다립니다. 2편보다 두 배 빠르게 깜빡여요.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">업로드하고 결과 보기</h2>
+
+<p style="font-size:16px;">USB 케이블을 꽂고, 2편에서 한 것처럼 체크(✓)로 확인한 뒤 화살표(→)로 업로드하세요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (07-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">브레드보드의 LED가 0.5초마다 깜빡이고, 우노 R3라면 보드의 L LED도 함께 깜빡입니다. 시리얼 모니터(속도 9600)에는 "브레드보드 LED 준비 완료!"가 한 번 나오고, "LED 켜짐"과 "LED 꺼짐"이 번갈아 나와요.</p>
+
+<p style="font-size:16px;">※ 회로를 바르게 연결하고 업로드했다면 그림처럼 동작합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<ul style="font-size:16px;">
+<li><b>L은 깜빡이는데 브레드보드 LED만 안 켜져요</b> → LED를 거꾸로 꽂지 않았는지(긴 다리가 저항 쪽), 다리가 같은 줄에 나란히 꽂히지 않았는지 확인하세요.</li>
+<li><b>둘 다 안 켜져요</b> → 업로드가 됐는지, 코드의 핀 번호(13)와 점퍼선을 꽂은 핀이 같은지 확인하세요.</li>
+<li><b>전선은 맞는데 안 돼요</b> → 부품 다리가 구멍에 끝까지 들어갔는지, 가운데 홈을 건너 끊긴 줄에 꽂지 않았는지 보세요.</li>
+<li><b>LED가 아주 어두워요</b> → ① LED 방향 ② 저항 색 띠(빨강·빨강·갈색인지, 220Ω보다 훨씬 큰 10kΩ 같은 저항을 꽂지 않았는지) ③ 저항과 LED가 같은 묶음 줄에 제대로 꽂혔는지 순서대로 확인하세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 확인할 것 (08-안-될-때.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다음 편: 버튼으로 LED를 켜고 끄자</h2>
+
+<p style="font-size:16px;"><b>🎯 두이의 미션</b></p>
+
+<ul style="font-size:16px;">
+<li><b>핀 옮기기</b>: 점퍼선을 13번에서 <b>8번 핀</b>으로 옮기고, 코드 첫 줄을 <code>int ledPin = 8;</code>로 바꿔 보기. 이번엔 L LED는 가만히 있고 브레드보드 LED만 깜빡일 거예요.</li>
+<li><b>속도 바꾸기</b>: delay 숫자를 바꿔 내가 좋아하는 깜빡임 빠르기 찾기</li>
+<li><b>관찰하기</b>: 키트에 1kΩ 저항이 있다면 220Ω 대신 끼워 보고 밝기를 비교해 보기</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두이의 미션 (09-두이의-미션.png) ]]</p>
+
+<p style="font-size:16px;">다음 편에서는 <b>버튼</b>을 달아서, 누를 때만 LED가 켜지게 만들어 봅니다. 아두이노가 처음으로 '입력'을 읽는 순간이에요.</p>
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 회로 첫 완성 축하해! 다음엔 내가 버튼을 누르면 불이 켜지게 해 볼 거야. 키트에서 작은 버튼(택트 스위치)을 찾아 둬!</p>
+
+<p style="font-size:16px;"><b>👩‍🏫 학부모·선생님께</b></p>
+
+<ul style="font-size:16px;">
+<li>부품을 꽂거나 옮길 때는 꼭 USB 케이블을 뽑은 상태에서 하도록 지도해 주세요.</li>
+<li>저항 없이 LED를 핀에 바로 연결하지 않도록 한 번 더 강조해 주세요. 보드와 LED가 망가질 수 있습니다.</li>
+<li>LED와 저항의 다리는 끝이 뾰족하니 손을 찔리지 않게 주의해 주세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (10-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">(링크 자리) [아두이노 기초 #2] 프로그램 설치하고 첫 LED 깜빡이기</p>
