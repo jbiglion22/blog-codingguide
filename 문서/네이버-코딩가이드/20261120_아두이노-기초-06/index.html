@@ -1,0 +1,242 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [아두이노 기초 #6] 누를 때마다 켜고 끄는 스위치 만들기
+독자: 초등학생~중학생과 지도하는 학부모·선생님. 독자는 자기 아두이노(실물)로 따라 한다. 안내 캐릭터 '두이'(인사·꿀팁·미션·예고).
+검색 설명: 아두이노 기초 연재 6편. 버튼을 한 번 누르면 LED가 켜지고 다시 누르면 꺼지는 스위치를 만든다. 아두이노의 기억 상자(변수), '막 누른 순간'을 찾는 방법, 버튼 떨림(채터링)과 간단한 디바운스를 쉬운 비유로 풀었다. 초·중학생 눈높이.
+카테고리: 아두이노·라즈베리파이
+태그: #아두이노 #아두이노기초 #아두이노버튼 #토글스위치 #채터링 #디바운스 #변수 #초등코딩 #중학생코딩
+글자 수: 본문 공백 포함 4,085자 / 공백 제외 3,148자 (코드 포함, 빨간 이미지 표시 제외)
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 네이버 아두이노 연재 기초 6편(목차·규칙은 저장소 루트 '네이버-코딩가이드-아두이노-연재.md'). 이전 편: 기초 5편 「버튼으로 LED 켜기, 누르면 왜 0일까」. 다음 편: 기초 7편 「시리얼 모니터로 아두이노와 대화하기」.
+          만든 경과(본문에는 쓰지 않음): 처음엔 버튼 글 한 편(당시 4편)에 들어 있던 '누를 때마다 켜고 끄기·채터링' 부분을, 사용자 지시(어린이 눈높이로 개념을 줄이고 편을 나눔, 2026-11-20)로 따로 떼어 이 편으로 만들었다. 그때 받은 외부 검수(간단한 디바운스의 한계, 결과 표현 등)는 이 편에도 반영했다.
+발행 시점: 5편 발행 일주일 뒤 권장.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 기초 5편 링크로 바꾼다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT 요청, 1:1, 두이)
+02-이번-편에서-만들-것.png (ChatGPT 그림의 아래 칸 '② 누를 때마다'를 잘라 씀, 두이)
+03-배선도.png (AI, 5편 배선도와 같음)
+04-막-누른-순간.png (AI, 4:5)
+05-버튼-떨림.png (ChatGPT, 3:2, 두이)
+06-떨림-막기-전후.png (AI, 4:5)
+07-안-될-때.png (AI, 4:5)
+08-두이의-미션.png (AI, 1:1)
+09-함께-보면-좋은-글.png (공통 배너)
+
+[외부 검수 반영] 2026-11-20 열두 가지 모두 반영: 변수 이름을 코드 표시로, '눌려 있는가만 보고 바꾸면 반복될 수 있다'(지금 코드의 문제가 아님을 분명히), 막 누른 순간을 5편의 '안 누르면 1·누르면 0'과 이어 설명, 버튼 배선은 '한쪽 다리 → 다른 쌍의 다리', 코드 설명에서 ledState와 lastButton의 역할 구분, != 는 다르면 참·같으면 거짓, 채터링은 '버튼 안 금속 접점'이 흔들림, 0.05초 기다림은 '떨림을 줄이기 위한 것·꼭 0.05초 안에 멈춘다는 뜻은 아님', 5편 코드로는 버튼 회로만 확인됨, 100ms로 늘리면 빠른 입력을 놓칠 수 있음, 횟수 미션 구체화. lastButton이 기다리기 전 값을 기록한다는 점은 학부모·선생님 칸에. 그림 03·04·06은 검수 확인 항목과 맞음, 05는 접점 그림이 아니라 '통통 튀는 공' 비유 그림(본문 비유와 짝).
+
+[근거 — 공식 문서 확인] 2026년 11월 20일
+- 「Debounce on a Pushbutton」 https://docs.arduino.cc/built-in-examples/digital/Debounce/ : 버튼은 기계적·물리적 이유로 누를 때 아주 짧은 시간에 열림·닫힘이 여러 번 생기고, 프로그램이 이를 여러 번 누른 것으로 읽을 수 있다. 짧은 시간 안에 한 번 더 확인하는 것이 디바운스(이 예제는 millis()로 시간을 잼).
+- 「State Change Detection」 https://docs.arduino.cc/built-in-examples/digital/StateChangeDetection/ 와 예제 원본(github.com/arduino/arduino-examples, StateChangeDetection.ino): 바로 전 값과 지금 값을 비교해 바뀐 순간만 처리, 바뀐 뒤 delay(50)으로 떨림을 피함("Delay a little bit to avoid bouncing"). 이 글의 코드는 이 방식을 INPUT_PULLUP(누르면 LOW)에 맞춘 것.
+- 「InputPullupSerial」·「Digital Pins」(5편과 같음): INPUT_PULLUP이면 안 누름 HIGH·누름 LOW.
+- 일반 지식으로 쓴 것(발행 메모 표시): 기억 상자 비유, 교실 문으로 들어오는 순간 세기 비유, 통통 튀는 공 비유.
+- 코드 확인: 5편 회로(13번 → 220Ω → LED → GND, 2번 핀 ↔ 버튼 ↔ GND)와 이 글의 코드를 Wokwi 시뮬레이터에서 버튼을 눌러 가며 실행해 확인(실물 보드로는 확인하지 못함). delay(50)을 빼면 시뮬레이터의 버튼 떨림 흉내 때문에 두 번 눌렀을 때 '켜짐/꺼짐'이 13줄 찍혔고, 넣으면 '켜짐', '꺼짐' 두 줄만 찍혔다. 그림 06은 이 출력을 바탕으로 '떨림이 있는 버튼의 예'로 그렸다. 본문·그림에는 시뮬레이터 언급 없음(사용자 결정 2026-11-19).
+-->
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 안녕! 지난번엔 누르는 동안만 불이 켜졌지? 오늘은 진짜 방 전등 스위치처럼 만들어 볼 거야!</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">'아두이노 기초' 연재 6편입니다. 5편에서는 버튼을 누르고 있는 동안만 LED를 켰어요.</p>
+
+<p style="font-size:16px;">그런데 방 전등 스위치는 그렇지 않죠. 한 번 누르면 켜지고, 손을 떼도 켜져 있어요. 다시 누르면 꺼지고요. 오늘은 이런 스위치를 만들어요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이번 편에서 만들 것</h2>
+
+<ul style="font-size:16px;">
+<li>버튼을 한 번 누르면 LED가 <b>켜져요</b>.</li>
+<li>손을 떼도 LED는 <b>켜진 채</b>로 있어요.</li>
+<li>다시 한 번 누르면 LED가 <b>꺼져요</b>.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이번 편에서 만들 것 (02-이번-편에서-만들-것.png) ]]</p>
+
+<p style="font-size:16px;"><b>준비물</b>: 5편에서 만든 회로 그대로 (새 부품은 없어요)</p>
+
+<p style="font-size:16px;">이 스위치를 만들려면 아두이노가 두 가지를 할 줄 알아야 해요. 하나씩 알아봐요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">첫째, 기억하기</h2>
+
+<p style="font-size:16px;">손을 떼도 LED가 켜져 있으려면, 아두이노가 'LED가 지금 켜져 있다'는 걸 <b>기억</b>해야 해요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 이름표 붙은 기억 상자</b></p>
+
+<ul style="font-size:16px;">
+<li>아두이노 안에 이름표를 붙인 작은 상자가 있다고 생각해 보세요.</li>
+<li><code>ledState</code> 상자에는 LED가 지금 켜져 있는지 꺼져 있는지를 기억해요.</li>
+<li><code>lastButton</code> 상자에는 바로 전에 읽은 버튼의 상태를 기억해요.</li>
+<li>한 줄 정리: 이런 상자를 <b>변수</b>라고 해요. 3편의 <code>ledPin</code>도 같은 상자였어요!</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">둘째, '막 누른 순간' 찾기</h2>
+
+<p style="font-size:16px;">버튼을 누르고 있는 동안 아두이노는 버튼 상태를 아주 빠르게 여러 번 읽어요. 그래서 만약 5편처럼 '눌려 있는가'만 보고 LED를 바꾸면, 누르고 있는 동안 켰다 껐다가 계속 반복될 수 있어요.</p>
+
+<p style="font-size:16px;">그래서 버튼이 <b>막 눌린 그 순간</b> 딱 한 번만 바꿔야 해요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 교실에 들어오는 순간 세기</b></p>
+
+<ul style="font-size:16px;">
+<li>교실에 몇 명이 들어오는지 센다고 해 봐요.</li>
+<li>문 앞에 서 있는 사람을 계속 세면 숫자가 엉망이 돼요.</li>
+<li>'밖에 있다가 안으로 들어온 순간'에만 한 번 세야 해요.</li>
+<li>버튼도 같아요. 5편에서 배웠듯이 버튼을 안 누르면 1, 누르면 0이에요. 그러니 <b>바로 전 값이 1이고 지금 값이 0</b>이면, 그때가 막 누른 순간이에요.</li>
+<li>한 줄 정리: 바로 전 값과 지금 값이 <b>다를 때</b>만 살펴봐요!</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 막 누른 순간 (04-막-누른-순간.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">회로 연결하기</h2>
+
+<p style="font-size:16px;">회로는 5편과 똑같아요. 그대로 쓰면 돼요.</p>
+
+<ul style="font-size:16px;">
+<li>LED: 13번 핀 → 220Ω 저항 → LED → GND</li>
+<li>버튼: 2번 핀 → 버튼의 한쪽 다리 → 다른 쌍의 다리 → GND (대각선 다리를 쓰면 쉬워요)</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 배선도 (03-배선도.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">코드 쓰기</h2>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>int ledPin = 13;
+int buttonPin = 2;
+int ledState = LOW;      // 지금 LED 상태(처음엔 꺼짐)
+int lastButton = HIGH;   // 바로 전에 읽은 버튼 값
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int nowButton = digitalRead(buttonPin);
+
+  if (nowButton != lastButton) {   // 버튼 값이 바뀌었을 때만
+    if (nowButton == LOW) {        // 막 누른 순간이면
+      if (ledState == LOW) {
+        ledState = HIGH;
+        Serial.println("LED 켜짐");
+      } else {
+        ledState = LOW;
+        Serial.println("LED 꺼짐");
+      }
+      digitalWrite(ledPin, ledState);
+    }
+    delay(50);                     // 떨림을 건너뛰려고 잠깐 기다리기
+  }
+  lastButton = nowButton;          // 이번 값을 기억해 두기
+}</code></pre>
+
+<p style="font-size:16px;">길어 보이지만 세 덩어리로 나누면 쉬워요.</p>
+
+<ul style="font-size:16px;">
+<li><b>맨 위</b>: 기억 상자 두 개를 만들어요. <code>ledState</code>는 LED 꺼짐(<code>LOW</code>)으로, <code>lastButton</code>은 버튼 안 누른 상태(<code>HIGH</code>)로 시작해요.</li>
+<li><b>가운데</b>: 버튼 값이 바로 전과 달라졌고(<code>!=</code>), 새 값이 <code>LOW</code>라면 막 누른 것으로 판단해요. 그때 <code>ledState</code>를 반대로 바꿔요. 켜져 있으면 끄고, 꺼져 있으면 켜요.</li>
+<li><b>맨 아래</b>: 지금 읽은 값을 '바로 전 값' 상자에 옮겨 둬요. 다음 비교에 쓰려고요.</li>
+</ul>
+
+<p style="font-size:16px;"><code>!=</code>는 '다른가?' 하고 묻는 기호예요. 5편의 <code>==</code>(같은가?)와 반대예요. 두 값이 다르면 '맞다(참)', 같으면 '아니다(거짓)'가 돼요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">delay(50)은 왜 있을까: 버튼 떨림</h2>
+
+<p style="font-size:16px;">코드에 <code>delay(50);</code>이라는 줄이 있죠? 이 줄이 없으면 이상한 일이 생길 수 있어요. 한 번 눌렀는데 LED가 여러 번 바뀌는 거예요.</p>
+
+<p style="font-size:16px;">버튼 안에는 작은 금속 조각(접점)이 있어요. 누르는 순간 이 접점이 한 번에 딱 붙지 않고, 아주 짧게 붙었다 떨어졌다를 반복할 수 있어요. 이것을 <b>채터링(버튼 떨림)</b>이라고 해요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 버튼 떨림 (05-버튼-떨림.png) ]]</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 통통 튀는 공</b></p>
+
+<ul style="font-size:16px;">
+<li>공을 바닥에 떨어뜨리면 바로 멈추지 않고 통통 튀어요.</li>
+<li>버튼 속 금속 접점도 눌리는 순간 아주 작게 튀어요.</li>
+<li>사람 눈에는 한 번이지만, 아주 빠른 아두이노는 여러 번 누른 걸로 읽어요.</li>
+<li>그래서 값이 바뀐 걸 알아챈 뒤 <b>0.05초 기다려요</b>. 그 짧은 사이에 생기는 떨림을 줄이려는 거예요. (버튼이 꼭 0.05초 안에 멈춘다는 뜻은 아니에요.)</li>
+<li>한 줄 정리: 떨림을 건너뛰는 이 방법을 <b>디바운스</b>라고 해요!</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 떨림 막기 전과 후 (06-떨림-막기-전후.png) ]]</p>
+
+<p style="font-size:16px;">그림은 떨림이 있는 버튼을 예로 든 거예요. 떨림이 얼마나 생기는지는 버튼마다 달라요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">업로드하고 결과 보기</h2>
+
+<p style="font-size:16px;">USB 케이블을 꽂고 업로드한 뒤, 시리얼 모니터(속도 9600)를 열어요.</p>
+
+<ul style="font-size:16px;">
+<li>버튼을 한 번 누르면 LED가 켜져요. 시리얼 모니터에 "LED 켜짐"이 나와요.</li>
+<li>손을 떼도 LED는 켜져 있어요.</li>
+<li>다시 누르면 LED가 꺼지고 "LED 꺼짐"이 나와요.</li>
+</ul>
+
+<p style="font-size:16px;">※ 회로를 바르게 연결하고 업로드했다면 이렇게 동작합니다.</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 시리얼 모니터에 한글이 깨져 보이면 "LED ON", "LED OFF"처럼 영어로 바꿔도 돼. 하는 일은 똑같아!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<ul style="font-size:16px;">
+<li><b>눌러도 아무 변화가 없어요</b> → 5편 코드를 먼저 올려 버튼을 확인해 보세요. 안 누를 때 1, 누를 때 0이 나오면 버튼 쪽 회로는 괜찮아요. LED가 안 켜지면 LED 쪽 연결도 따로 살펴보세요.</li>
+<li><b>한 번 눌렀는데 두 번 바뀌어요</b> → <code>delay(50);</code>이 있는지 보세요. 그래도 그러면 50을 100으로 바꿔 시험해 보세요. 다만 너무 늘리면 빠르게 누르는 걸 놓칠 수 있어요.</li>
+<li><b>누를 때마다가 아니라 누르고 있는 동안 깜빡여요</b> → <code>if (nowButton != lastButton)</code> 줄과 맨 아래 <code>lastButton = nowButton;</code> 줄이 있는지 보세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 확인할 것 (07-안-될-때.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다음 편: 시리얼 모니터로 아두이노와 대화하기</h2>
+
+<p style="font-size:16px;"><b>🎯 두이의 미션</b></p>
+
+<ul style="font-size:16px;">
+<li><b>몇 번 눌렀을까</b>: 기억 상자를 하나 더 만들어, 버튼을 누를 때마다 숫자가 1씩 늘어나게 하고 시리얼 모니터에 보여 주기 (힌트: <code>count = count + 1;</code>)</li>
+<li><b>떨림 관찰하기</b>: <code>delay(50);</code> 줄을 지우고 여러 번 눌러 보며, 한 번에 여러 줄이 찍히는지 살펴보기</li>
+<li><b>켜진 채로 시작하기</b>: 처음부터 LED가 켜져 있게 바꿔 보기 (힌트: <code>ledState</code>의 처음 값)</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두이의 미션 (08-두이의-미션.png) ]]</p>
+
+<p style="font-size:16px;">다음 편에서는 오늘도 쓴 <b>시리얼 모니터</b>를 제대로 알아봐요. 아두이노와 글자로 대화하는 방법이에요.</p>
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 진짜 스위치 완성! 이제 나는 기억도 하고, 순간도 알아채. 다음엔 나랑 글자로 이야기해 보자!</p>
+
+<p style="font-size:16px;"><b>👩‍🏫 학부모·선생님께</b></p>
+
+<ul style="font-size:16px;">
+<li>부품을 꽂거나 옮길 때는 꼭 USB 케이블을 뽑은 상태에서 하도록 지도해 주세요.</li>
+<li>이 편의 핵심은 '바로 전 값과 지금 값을 비교한다'는 생각입니다. 종이에 1, 1, 0, 0, 1을 적고 '바뀐 곳'에 동그라미를 쳐 보게 하면 이해가 빠릅니다.</li>
+<li>본문은 쉽게 줄여 썼습니다. 정확히는 이렇습니다.
+  <ul>
+  <li>이 코드의 <code>delay(50)</code>은 아두이노 공식 예제(State Change Detection)와 같은, 학습용 간단한 디바운스입니다. 기다린 뒤 버튼 상태를 다시 확인하지는 않아서 모든 버튼의 떨림을 완벽히 없애지는 못합니다.</li>
+  <li>또 <code>lastButton = nowButton;</code>은 50ms를 기다린 뒤에 실행되지만, 기록하는 값은 기다리기 전에 읽은 값입니다. 그래서 떨림이 50ms보다 길게 이어지는 버튼에서는 여전히 여러 번 인식될 수 있습니다.</li>
+  <li>더 정확하게 하려면 일정 시간이 지난 뒤 버튼 상태를 다시 확인해, 그때도 같은 값일 때만 눌린 것으로 치는 방법을 씁니다(공식 예제 Debounce는 <code>millis()</code>로 시간을 재는 방식).</li>
+  <li>떨림이 나타나는 정도는 버튼마다 다릅니다. <code>delay(50)</code>이 없어도 멀쩡해 보이는 버튼도 있고, 넣어도 가끔 두 번 바뀌는 버튼도 있을 수 있습니다.</li>
+  </ul>
+</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (09-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">(링크 자리) [아두이노 기초 #5] 버튼으로 LED 켜기, 누르면 왜 0일까</p>

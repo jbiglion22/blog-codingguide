@@ -1,0 +1,258 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [아두이노 기초 #5] 버튼으로 LED 켜기, 누르면 왜 0일까
+독자: 초등학생~중학생과 지도하는 학부모·선생님. 독자는 자기 아두이노(실물)로 따라 한다. 안내 캐릭터 '두이'(인사·꿀팁·미션·예고).
+검색 설명: 아두이노 기초 연재 5편. 택트 스위치(버튼) 속 구조, 버튼을 누르면 0이 나오는 INPUT_PULLUP, '만약 ~라면'을 뜻하는 if/else를 쉬운 비유로 풀고, 버튼을 누르는 동안만 LED가 켜지는 회로와 코드를 초·중학생 눈높이로 정리했다.
+카테고리: 아두이노·라즈베리파이
+태그: #아두이노 #아두이노기초 #아두이노버튼 #택트스위치 #INPUT_PULLUP #풀업저항 #digitalRead #if문 #초등코딩 #중학생코딩
+글자 수: 본문 공백 포함 4,202자 / 공백 제외 3,228자 (코드 포함, 빨간 이미지 표시 제외)
+본문 글자 크기: 16px(문단·목록·이미지 표시에 인라인으로 지정, 소제목 h2 22px·h3 19px).
+연재: 네이버 아두이노 연재 기초 5편(목차·규칙은 저장소 루트 '네이버-코딩가이드-아두이노-연재.md'). 이전 편: 기초 4편 「저항을 바꾸면 LED 밝기가 달라질까」. 다음 편: 기초 6편 「누를 때마다 켜고 끄는 스위치 만들기」.
+발행 시점: 4편 발행 일주일 뒤 권장.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 줄은 기초 4편 링크로 바꾼다.
+
+[고친 경과] 2026-11-20
+- 처음 원고는 버튼·풀업·if에 더해 '누를 때마다 켜고 끄기'(상태 변수, 바뀐 순간, 채터링, 디바운스)까지 한 편에 담았고, 외부 검수 열한 가지 중 열 가지를 반영했다(같은 쪽 두 다리 표현만 다르게 씀).
+- 사용자 지시('어투는 어린이용인데 내용이 어렵다. 편수는 늘려도 되니 문장은 짧게, 어려운 개념은 적게, 어려운 개념은 꼭 쉽게 이해시키는 시간을')로 다시 썼다: 누를 때마다 켜고 끄기·채터링은 6편으로 옮기고, 이 편은 버튼 속 구조·풀업(누르면 0)·if/else 세 가지만 다룬다. 어려운 개념마다 '🧩 쉽게 이해하기' 칸을 두고, 정확성 단서(내부 풀업 값, 떠 있는 핀, 13번 핀, 읽는 간격)는 '학부모·선생님께'로 옮겼다. 검수에서 고친 정확성(서로 다른 쌍의 다리, 전원 전압, 입력 값과 출력 동작 구분)은 그대로 지켰다.
+- 같은 날 사용자 제안으로 3편을 보충하는 새 4편(「저항을 바꾸면 LED 밝기가 달라질까」)을 넣어 이 글은 5편이 됐다(3편은 이미 발행돼 고칠 수 없음). 폴더도 기초-04 → 기초-05로 옮겼다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT, 1:1, 두이 — 글자 중심이 정중앙보다 약 110px 위, 사용자 결정으로 이대로 씀)
+02-이번-편에서-만들-것.png (ChatGPT 그림의 위 칸 '① 누르는 동안만'을 잘라 씀, 두이)
+03-버튼-속.png (AI, 4:5)
+04-풀업.png (AI, 4:5)
+05-배선도.png (AI, 4:5)
+06-실행-결과.png (AI, 4:5)
+07-안-될-때.png (AI, 4:5)
+08-두이의-미션.png (AI, 1:1)
+09-함께-보면-좋은-글.png (공통 배너)
+
+[외부 검수 반영] 2026-11-20 열다섯 가지 모두 반영(어린이 눈높이에 맞게 짧은 문장으로): '연결했고', 대각선 다리는 '키트에 흔한 4다리 택트 스위치' 기준, 풀업이 필요한 이유(전원·GND 어디에도 연결 안 됨 → 값이 정해지지 않고 잡음에 따라 오감), 풀업은 '전원 전압 쪽으로 약하게 연결', 1·0은 버튼 핀의 전기 신호 상태, 용수철 비유에 'GND와 연결되면서 0', 배선은 다리가 꽂힌 구멍과 같은 줄·서로 다른 쌍, GND 핀 표현, delay(100)로 빠른 입력을 놓칠 수 있음(본문에도), pinMode·digitalRead 설명, if 예시는 생김새만 흉내 낸 것, == 와 = 의 차이, '눌러도 1만'은 서로 다른 쌍 다리에 각각 연결됐는지, 13번 핀은 내장 LED 회로 때문. 그림 07 문구 고침, 03~06은 검수 확인 항목과 맞음을 확인.
+
+[근거 — 공식 문서 확인] 2026년 11월 20일
+- 「InputPullupSerial」 https://docs.arduino.cc/built-in-examples/digital/InputPullupSerial/ : 버튼 한쪽 다리는 GND, 다른 다리는 디지털 2번 핀. pinMode(2, INPUT_PULLUP)로 내부 풀업을 켜면 버튼을 안 눌렀을 때 HIGH(1), 누르면 GND와 이어져 LOW(0). 시리얼 모니터에 안 누르면 1, 누르면 0이 이어서 나온다.
+- 「Digital Pins」 https://docs.arduino.cc/learn/microcontrollers/digital-pins/ : 아무것도 연결하지 않은 INPUT 핀은 주변 전기 잡음 때문에 값이 제멋대로 바뀐다. INPUT_PULLUP은 칩 안의 풀업 저항을 켜는 것이고, 스위치에서는 안 누름 HIGH·누름 LOW가 된다. 대부분의 AVR 보드에서 내부 풀업은 20~50kΩ. 스위치의 다른 쪽은 GND에 연결. 13번 핀은 보드의 LED와 저항이 붙어 있어 입력으로 쓰기 어렵다.
+- 일반 지식으로 쓴 것(발행 메모 표시): 택트 스위치 다리 4개는 두 개씩 한 쌍으로 늘 이어져 있고 누르면 두 쌍이 이어진다는 구조, 대각선 다리는 늘 서로 다른 쌍이라는 요령, 우노의 GND 핀은 여러 개이고 서로 이어져 있다는 점, 문·용수철 비유, 우산 비유.
+- 코드·회로 확인: 3편 LED 회로(13번 → 220Ω → LED → GND)에 버튼(2번 핀 ↔ GND)을 더한 회로와 이 글의 코드를 Wokwi 시뮬레이터에서 버튼을 눌러 가며 실행해 확인(실물 보드로는 확인하지 못함). 안 누르면 1·LED 꺼짐, 누르는 동안 0·LED 켜짐, 떼면 다시 1. 본문·그림에는 시뮬레이터 언급 없음(사용자 결정 2026-11-19).
+-->
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 안녕! 지금까지는 아두이노가 혼자 불을 켰지? 오늘은 네가 버튼을 누르면 아두이노가 알아채게 할 거야!</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">'아두이노 기초' 연재 5편입니다. 3편에서는 브레드보드에 LED와 저항을 연결했고, 4편에서는 저항을 바꾸면 LED 밝기가 어떻게 달라지는지 알아봤어요.</p>
+
+<p style="font-size:16px;">지금까지 아두이노는 LED에 신호를 <b>내보내기</b>만 했어요. 오늘은 처음으로 바깥에서 신호를 <b>받아들이는</b> 일을 해 봅니다.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 출력과 입력</b></p>
+
+<ul style="font-size:16px;">
+<li><b>출력</b>은 아두이노가 '말하는' 거예요. LED를 켜라고 말하는 것처럼요.</li>
+<li><b>입력</b>은 아두이노가 '듣는' 거예요. 버튼이 눌렸는지 귀 기울여 듣는 거죠.</li>
+<li>한 줄 정리: 지금까지는 말하기, 오늘은 듣기!</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">이번 편에서 만들 것</h2>
+
+<p style="font-size:16px;">버튼을 <b>누르고 있는 동안</b>만 LED가 켜지게 만듭니다. 손을 떼면 LED가 꺼져요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이번 편에서 만들 것 (02-이번-편에서-만들-것.png) ]]</p>
+
+<p style="font-size:16px;"><b>준비물</b>: 3편에서 만든 LED 회로 + <b>택트 스위치 1개</b> + 점퍼선 2개</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">작은 버튼 속은 어떻게 생겼을까</h2>
+
+<p style="font-size:16px;">키트에 있는 네모난 작은 버튼을 <b>택트 스위치</b>라고 해요. 다리가 4개 달려 있어요.</p>
+
+<ul style="font-size:16px;">
+<li>다리 4개는 <b>두 개씩 한 쌍</b>이에요.</li>
+<li>같은 쌍의 두 다리는 안에서 <b>늘 이어져</b> 있어요.</li>
+<li>버튼을 <b>누르면</b> 두 쌍이 서로 이어져요.</li>
+<li>손을 떼면 다시 끊겨요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 버튼 속 (03-버튼-속.png) ]]</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 버튼은 두 쌍 사이의 문</b></p>
+
+<ul style="font-size:16px;">
+<li>두 쌍 사이에 작은 문이 있다고 생각해 보세요.</li>
+<li>평소에는 문이 닫혀 있어서 전기가 못 건너가요.</li>
+<li>버튼을 누르면 문이 열려 전기가 건너가요.</li>
+<li>한 줄 정리: 선은 <b>서로 다른 쌍</b>에 하나씩 꽂아야 문 양쪽에 연결돼요.</li>
+</ul>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 어느 다리끼리 한 쌍인지 헷갈리지? 그럴 땐 <b>대각선으로 마주 보는 다리 두 개</b>를 써! 키트에 흔한 다리 4개짜리 택트 스위치는 대각선 다리가 서로 다른 쌍이거든.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">버튼을 누르면 왜 0이 될까</h2>
+
+<p style="font-size:16px;">버튼을 핀에 그냥 연결하면 문제가 생겨요. 버튼을 안 누를 때 핀이 전원에도, GND에도 연결되지 않거든요.</p>
+
+<p style="font-size:16px;">그러면 핀의 값이 하나로 정해지지 않아요. 주변의 작은 전기 잡음에 따라 1과 0을 제멋대로 오가요. 아두이노가 헷갈리는 거죠.</p>
+
+<p style="font-size:16px;">그래서 핀을 평소에 <b>전원 전압 쪽으로 약하게 연결</b>해 두는 기능을 켭니다. 이것을 <b>풀업</b>이라고 해요.</p>
+
+<p style="font-size:16px;">코드에 <code>INPUT_PULLUP</code>이라고 쓰면 풀업이 켜져요. 그러면 이렇게 됩니다.</p>
+
+<ul style="font-size:16px;">
+<li><b>안 누를 때</b>: <b>1</b> (HIGH)</li>
+<li><b>누를 때</b>: <b>0</b> (LOW)</li>
+</ul>
+
+<p style="font-size:16px;">여기서 1과 0은 버튼 핀에서 읽은 전기 신호의 상태를 숫자로 나타낸 거예요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 풀업 (04-풀업.png) ]]</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 용수철 달린 문</b></p>
+
+<ul style="font-size:16px;">
+<li>용수철이 달린 문을 떠올려 보세요.</li>
+<li>용수철이 문을 늘 <b>닫힌 쪽</b>으로 당겨요. 풀업이 핀을 전원 쪽으로 당기는 것과 같아요. 그래서 버튼을 안 누르면 값은 <b>1</b>이에요.</li>
+<li>손으로 밀면 문이 열리죠. 버튼을 누르면 핀이 <b>GND와 연결</b>되면서 값이 <b>0</b>이 돼요.</li>
+<li>한 줄 정리: 풀업에서는 <b>안 누르면 1, 누르면 0</b>! 거꾸로 같지만 이게 맞아요.</li>
+</ul>
+
+<p style="font-size:16px;">여기서 1과 0은 '버튼을 눌렀는지'를 읽은 값이에요. LED가 켜졌는지와는 다른 이야기니 헷갈리지 마세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">회로 연결하기</h2>
+
+<p style="font-size:16px;">3편의 LED 회로는 그대로 둬요. 버튼만 더합니다. <b>USB 케이블을 뽑고</b> 꽂으세요.</p>
+
+<ul style="font-size:16px;">
+<li><b>①</b> 버튼을 브레드보드 <b>가운데 홈에 걸쳐</b> 꽂아요.</li>
+<li><b>②</b> 보드의 <b>2번 핀</b>을 버튼의 한쪽 다리에 연결해요. 그 다리가 꽂힌 브레드보드 구멍과 같은 줄에 선을 꽂으면 돼요.</li>
+<li><b>③</b> 보드의 <b>GND</b>를 버튼의 <b>대각선 반대쪽</b> 다리에 같은 방법으로 연결해요.</li>
+<li>두 선은 꼭 <b>서로 다른 쌍</b>의 다리에 연결해요. 배선도의 빨간 동그라미 자리를 보세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 배선도 (05-배선도.png) ]]</p>
+
+<p style="font-size:16px;">우노 보드에는 GND 핀이 여러 개 있어요. 서로 연결되어 있으니 쓰기 편한 GND 핀을 골라 쓰면 돼요.</p>
+
+<p style="font-size:16px;">버튼에는 저항을 따로 달지 않아요. <code>INPUT_PULLUP</code>이 그 일을 대신해 주거든요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">코드 쓰기</h2>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>int ledPin = 13;     // LED를 꽂은 핀
+int buttonPin = 2;   // 버튼을 꽂은 핀
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP);   // 버튼 핀을 '풀업 입력'으로
+  Serial.begin(9600);
+}
+
+void loop() {
+  int buttonState = digitalRead(buttonPin);   // 버튼 읽기
+  Serial.println(buttonState);                // 1 또는 0 보여 주기
+
+  if (buttonState == LOW) {      // 눌렀으면(LOW)
+    digitalWrite(ledPin, HIGH);  // LED 켜기
+  } else {                       // 안 눌렀으면(HIGH)
+    digitalWrite(ledPin, LOW);   // LED 끄기
+  }
+  delay(100);   // 잠깐 기다린 뒤 다시 버튼 읽기
+}</code></pre>
+
+<ul style="font-size:16px;">
+<li><code>pinMode(buttonPin, INPUT_PULLUP);</code> — 2번 핀을 입력('듣는 핀')으로 정하고 풀업을 켜요.</li>
+<li><code>digitalRead(buttonPin)</code> — 버튼 핀의 상태를 읽어요. 결과는 HIGH(1) 아니면 LOW(0)예요.</li>
+<li><code>Serial.println(buttonState);</code> — 읽은 값을 시리얼 모니터에 보여 줘요.</li>
+<li><code>delay(100);</code> — 0.1초마다 한 번씩 읽어요. 그래서 아주 빠르게 눌렀다 떼면 놓칠 수 있어요. 천천히 눌러 보세요.</li>
+</ul>
+
+<h3 style="font-size:19px;margin:28px 0 10px;">if와 else는 '만약에'</h3>
+
+<p style="font-size:16px;">코드 아래쪽의 <code>if</code>와 <code>else</code>가 오늘의 핵심이에요. 아두이노가 처음으로 <b>스스로 고르는</b> 부분이거든요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 우산 고르기</b></p>
+
+<ul style="font-size:16px;">
+<li>"만약 비가 오면 우산을 챙긴다. 아니면 모자를 쓴다."</li>
+<li>이 문장을 코드 모양으로 쓰면 <code>if (비가 온다) { 우산 } else { 모자 }</code>예요. 생김새만 흉내 낸 거라, 실제로는 아두이노가 알아듣는 말로 바꿔 써야 해요.</li>
+<li>오늘 코드도 똑같아요. "만약 버튼 값이 0이면 LED를 켠다. 아니면 끈다."</li>
+<li>한 줄 정리: <code>if</code>는 '만약에', <code>else</code>는 '아니면'!</li>
+</ul>
+
+<p style="font-size:16px;"><code>==</code>는 두 값이 <b>같은지 비교</b>하는 기호예요. 값을 넣어 두는 <code>=</code>(하나)와 달라요. 비교할 때는 꼭 <b>두 개</b>를 붙여 써요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">업로드하고 결과 보기</h2>
+
+<p style="font-size:16px;">USB 케이블을 꽂고 업로드하세요. 그다음 시리얼 모니터를 열고 속도를 9600에 맞춰요.</p>
+
+<ul style="font-size:16px;">
+<li>버튼을 안 누르면 <b>1</b>이 계속 나와요. LED는 꺼져 있어요.</li>
+<li>버튼을 누르고 있으면 <b>0</b>이 나와요. LED가 켜져요.</li>
+<li>손을 떼면 다시 1이 나오고 LED가 꺼져요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (06-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">※ 회로를 바르게 연결하고 업로드했다면 그림처럼 동작합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<ul style="font-size:16px;">
+<li><b>안 눌러도 0만 나와요</b> → 두 선을 같은 쌍 다리에 꽂았을 수 있어요. 대각선 다리로 다시 꽂아 보세요.</li>
+<li><b>눌러도 1만 나와요</b> → 2번 핀 선과 GND 선이 버튼의 서로 다른 쌍 다리에 각각 연결됐는지 보세요. 선과 다리가 구멍에 끝까지 들어갔는지도요.</li>
+<li><b>값이 제멋대로 바뀌어요</b> → 코드에 <code>pinMode(buttonPin, INPUT_PULLUP);</code>이라고 썼는지 확인하세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 확인할 것 (07-안-될-때.png) ]]</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 버튼은 13번 말고 2번 핀에 꽂아 줘. 우노의 13번 핀에는 보드에 붙은 작은 LED 회로가 연결돼 있어. 그래서 입력으로 쓰면 생각지 못한 영향을 받을 수 있거든.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:22px;margin:40px 0 12px;">다음 편: 누를 때마다 켜고 끄는 스위치</h2>
+
+<p style="font-size:16px;"><b>🎯 두이의 미션</b></p>
+
+<ul style="font-size:16px;">
+<li><b>거꾸로 만들기</b>: 버튼을 <b>안 누를 때 켜지고, 누르면 꺼지게</b> 바꿔 보기. 힌트는 <code>HIGH</code>와 <code>LOW</code>의 자리!</li>
+<li><b>핀 옮기기</b>: 버튼 선을 2번에서 <b>7번 핀</b>으로 옮기고, 코드의 숫자도 바꿔 보기</li>
+<li><b>글자로 보여 주기</b>: 1과 0 대신 "눌림", "안 눌림"이 나오게 바꿔 보기</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두이의 미션 (08-두이의-미션.png) ]]</p>
+
+<p style="font-size:16px;">다음 편에서는 방 전등 스위치처럼 만들어 봐요. <b>한 번 누르면 켜지고, 또 누르면 꺼지는</b> 스위치예요.</p>
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 버튼으로 불 켜기 성공! 이제 내가 네 손길을 알아챌 수 있어. 다음엔 진짜 스위치를 만들어 보자!</p>
+
+<p style="font-size:16px;"><b>👩‍🏫 학부모·선생님께</b></p>
+
+<ul style="font-size:16px;">
+<li>부품을 꽂거나 옮길 때는 꼭 USB 케이블을 뽑은 상태에서 하도록 지도해 주세요.</li>
+<li>'누르면 0'이 헷갈리는 학생이 많습니다. 시리얼 모니터의 1과 0을 보며 버튼을 눌렀다 떼 보게 하면 이해가 빠릅니다.</li>
+<li>본문은 쉽게 줄여 썼습니다. 정확히는 이렇습니다.
+  <ul>
+  <li>아무것도 연결하지 않은 입력 핀은 주변 전기 잡음 때문에 값이 제멋대로 바뀝니다(아두이노 공식 안내의 '떠 있는' 상태).</li>
+  <li><code>INPUT_PULLUP</code>은 칩 안의 풀업 저항을 켜서 핀을 전원 전압(우노는 5V) 쪽으로 약하게 이어 두는 기능입니다. 우노 같은 대부분의 AVR 보드에서 이 저항은 20~50kΩ으로 안내되어 있습니다.</li>
+  <li>13번 핀에는 보드에 붙은 LED 회로가 이어져 있어 입력으로 쓰면 예상하지 못한 영향을 받을 수 있습니다.</li>
+  <li>코드의 <code>delay(100)</code>은 0.1초 간격으로 버튼을 읽게 합니다. 아주 빠르게 눌렀다 떼면 그 짧은 입력을 놓칠 수 있습니다.</li>
+  </ul>
+</li>
+<li>택트 스위치 다리는 쉽게 휘어집니다. 휘었다면 무리하게 펴지 말고, 다치지 않게 조심해서 바로잡거나 새 부품으로 바꿔 주세요.</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (09-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">(링크 자리) [아두이노 기초 #4] 저항을 바꾸면 LED 밝기가 달라질까</p>
