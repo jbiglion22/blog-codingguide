@@ -1,0 +1,249 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [업무 파이썬 초급 #2] 폴더 속 파일 이름 한눈에 보기
+독자: 코딩을 해 본 적 없는 직장인. 윈도우 PC 기준. 0편(설치·IDLE), 1편(날짜 이름표)을 본 사람.
+검색 설명: 업무 파이썬 초급 연재 2편. 폴더에 쌓인 파일 이름을 파이썬으로 한 번에 뽑아 화면에 보여 주고 개수까지 센다. 여러 값을 담는 리스트, 하나씩 꺼내는 for 반복, 들여쓰기 규칙을 업무 예시로 풀었고, 결과를 엑셀에 붙이는 방법과 자주 나는 오류도 정리했다.
+카테고리: 파이썬 코딩
+태그: #파이썬 #파이썬기초 #파이썬초보 #업무자동화 #직장인 #파일목록 #파이썬for문 #파이썬리스트 #엑셀자동화 #pathlib
+글자 수: 본문 공백 포함 3,730자 / 공백 제외 2,985자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.21)
+본문 글자 크기: 16px. 소제목 h2 24px, h3 18px + 기호 ▣(이 글 안에서는 모두 같은 기호).
+연재: 「초보도 업무에서 바로 쓰는 파이썬」 초급 2편(목차·규칙은 저장소 루트 '네이버-코딩가이드-업무파이썬-연재.md'). 이전 편: 초급 1편 「보고서 이름에 날짜 자동 입력」.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+
+[이미지 순서와 각 그림이 이해시키는 것]
+01-타이틀.png (ChatGPT 요청, 1:1) — 연재 이름과 이번 편 주제를 목록 썸네일에서 알아보게
+02-결과-미리보기.png (AI, 4:5) — 탐색기 속 파일들이 코드 한 번으로 '글자 목록 + 개수'로 바뀐다는 완성 모습
+03-리스트는-칸-상자.png (AI, 4:5) — 리스트가 '번호 붙은 칸 여러 개'이고 번호가 0부터라는 것
+04-for-반복-흐름.png (AI, 4:5) — for가 칸에서 하나씩 꺼내 들여쓴 줄을 되풀이하는 순서와 들여쓰기 4칸
+05-실행-결과.png (AI, 4:5) — 실제 폴더에서 이름을 뽑은 코드와 그 출력(이 PC에서 실행한 실제 값)
+06-엑셀에-붙이기.png (AI, 4:5) — Shell 결과를 엑셀로 옮기는 세 동작
+07-안-될-때.png (AI, 4:5) — 실제 오류 메시지 네 가지와 고치는 법
+
+[근거 — 공식 문서 확인] 2026년 11월 21일
+- 「pathlib」 https://docs.python.org/3/library/pathlib.html : Path.iterdir()는 폴더 안 항목을 '정해지지 않은 순서(arbitrary order)'로 돌려줌(그래서 sorted로 정렬), Path.mkdir(exist_ok=...)는 이미 있으면 기본은 FileExistsError, Path.touch()는 파일을 만들고 이미 있으면 수정 시각만 바꿈, PurePath.name은 마지막 이름, PurePath.suffix는 마지막 점 뒤 확장자.
+- IDLE의 Run Module은 실행 전에 __file__을 그 파일 경로로 넣고, 작업 폴더를 그 파일이 있는 폴더로 바꾼다(Python 3.14 idlelib/runscript.py 소스로 확인). 그래서 Path(__file__).parent가 '이 코드 파일이 있는 폴더'가 된다. Shell에 한 줄씩 입력하면 __file__이 없어 NameError.
+- 코드 확인(2026.11.21, 윈도우 11·Python 3.14.5): 본문 코드 전부와 미션 코드를 실행. 리스트 출력 ['1월_매출.xlsx', '견적서_A사.pdf', '회의록.docx'] / 3 / 1월_매출.xlsx, for 출력 세 줄과 '끝', 연습 파일 8개 생성, 파일 목록 정렬 결과(1월·2월·3월 매출, 거래처_목록, 견적서 A·B, 행사_사진, 회의록_1105) '모두 8개', suffix 출력. 오류 메시지는 실제로 낸 것: IndentationError: expected an indented block after 'for' statement on line 2 / SyntaxError: expected ':' / FileNotFoundError: [WinError 3] 지정된 경로를 찾을 수 없습니다 / IndexError: list index out of range / (Shell에서) NameError: name '__file__' is not defined. Did you mean: '__name__'?
+- 정렬 순서는 숫자 → 한글 가나다 순으로 나왔다(문자 코드 순 정렬). 독자 PC에서도 같은 이름이면 같은 순서지만, 이름이 다르면 탐색기의 정렬과 조금 다를 수 있다고 본문에 적었다.
+- Shell 결과를 드래그해 복사한 뒤 엑셀에 붙이면 한 줄이 한 칸에 들어간다는 것은 일반적인 윈도우 동작(실제 엑셀 화면은 확인하지 못함, 그림은 도식).
+- 2026-11-21부터 적용한 형식: 소제목 h2 24px·h3 18px+기호, 짧은 문장·짧은 문단, 의미 있는 이미지만(실사 없음). 0·1편은 앞선 형식 그대로다.
+-->
+
+<p style="font-size:16px;">거래처에서 파일이 수십 개 들어왔습니다.</p>
+
+<p style="font-size:16px;">"받은 파일 목록 좀 정리해서 보내 줘." 이름을 하나씩 옮겨 적다 보면 꼭 하나씩 빠집니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">「초보도 업무에서 바로 쓰는 파이썬」 초급 2편입니다.</p>
+
+<p style="font-size:16px;">오늘은 폴더 속 파일 이름을 파이썬으로 한 번에 뽑아 봅니다. 개수까지 세어 줍니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">결과부터 보기</h2>
+
+<p style="font-size:16px;">코드를 실행하면 폴더 속 파일 이름이 줄줄이 나옵니다. 마지막 줄에는 모두 몇 개인지 나옵니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 결과 미리보기 (02-결과-미리보기.png) ]]</p>
+
+<p style="font-size:16px;">이 목록은 그대로 복사해 엑셀이나 메일에 붙일 수 있어요.</p>
+
+<p style="font-size:16px;">파일 이름을 바꾸지도, 지우지도 않습니다. <b>보기만</b> 하니까 안심하고 따라 하세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">1단계: 이름 여러 개를 한 이름표에 담기</h2>
+
+<p style="font-size:16px;">1편에서는 이름표(변수) 하나에 값 하나를 담았습니다.</p>
+
+<p style="font-size:16px;">파일은 여러 개입니다. 그래서 값을 여러 개 담는 방법이 필요해요.</p>
+
+<p style="font-size:16px;">IDLE에서 새 파일을 열고 아래를 입력한 뒤 F5를 눌러 보세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>names = ["1월_매출.xlsx",
+         "견적서_A사.pdf",
+         "회의록.docx"]
+print(names)
+print(len(names))
+print(names[0])</code></pre>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>['1월_매출.xlsx', '견적서_A사.pdf', '회의록.docx']
+3
+1월_매출.xlsx</code></pre>
+
+<p style="font-size:16px;">대괄호 <code>[ ]</code> 안에 쉼표로 값을 늘어놓은 것을 <b>리스트</b>라고 합니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 리스트는 칸 상자 (03-리스트는-칸-상자.png) ]]</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▣ 리스트에서 알아 둘 세 가지</h3>
+
+<ul style="font-size:16px;">
+<li><code>len(names)</code>는 칸이 몇 개인지 셉니다. 여기서는 3이에요.</li>
+<li><code>names[0]</code>은 첫 번째 칸입니다.</li>
+<li>번호는 <b>1이 아니라 0부터</b> 셉니다. 세 칸이면 0, 1, 2예요.</li>
+</ul>
+
+<p style="font-size:16px;">괄호 안에서는 줄을 바꿔 써도 됩니다. 휴대폰에서 읽기 쉽게 한 줄에 하나씩 적었어요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">2단계: 하나씩 꺼내 보여 주기</h2>
+
+<p style="font-size:16px;"><code>print(names)</code>는 대괄호와 따옴표까지 한 줄에 다 보여 줍니다. 보고서에 붙이기엔 불편하죠.</p>
+
+<p style="font-size:16px;">한 줄에 하나씩 보고 싶다면 <b>for</b>를 씁니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>names = ["1월_매출.xlsx",
+         "견적서_A사.pdf",
+         "회의록.docx"]
+for name in names:
+    print(name)
+print("끝")</code></pre>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>1월_매출.xlsx
+견적서_A사.pdf
+회의록.docx
+끝</code></pre>
+
+<p style="font-size:16px;"><code>for name in names:</code>는 "names에서 하나씩 꺼내 name이라 부르고, 아래 일을 해라"라는 뜻입니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: for 반복 흐름 (04-for-반복-흐름.png) ]]</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▣ 들여쓰기가 '아래 일'의 범위입니다</h3>
+
+<ul style="font-size:16px;">
+<li>줄 끝의 <b>쌍점(:)</b>은 "여기부터 할 일이 나온다"는 표시예요.</li>
+<li>반복할 줄은 <b>스페이스 4칸</b> 들여 씁니다. IDLE은 쌍점 뒤에 엔터를 치면 알아서 들여 줍니다.</li>
+<li><code>print("끝")</code>은 들여쓰지 않았습니다. 그래서 반복이 다 끝난 뒤 한 번만 나와요.</li>
+</ul>
+
+<p style="font-size:16px;">파이썬에서 들여쓰기는 꾸밈이 아니라 문법입니다. 칸 수가 틀리면 오류가 나요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">3단계: 연습용 파일 8개 만들기</h2>
+
+<p style="font-size:16px;">이제 진짜 폴더에서 이름을 가져올 차례입니다.</p>
+
+<p style="font-size:16px;">회사 파일로 연습하지 않도록, 연습 파일을 코드로 만들어 둘게요.</p>
+
+<p style="font-size:16px;">아래 코드를 <b>파이썬연습</b> 폴더에 <b>make_samples.py</b>로 저장하고 F5를 누르세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from pathlib import Path
+
+folder = Path(__file__).parent / "샘플"
+folder.mkdir(exist_ok=True)
+
+names = [
+    "1월_매출.xlsx",
+    "2월_매출.xlsx",
+    "3월_매출.xlsx",
+    "거래처_목록.xlsx",
+    "견적서_A사.pdf",
+    "견적서_B사.pdf",
+    "회의록_1105.docx",
+    "행사_사진.jpg",
+]
+for name in names:
+    (folder / name).touch()
+
+print("연습 파일을 만들었습니다.")</code></pre>
+
+<p style="font-size:16px;">'연습 파일을 만들었습니다.'가 나오면 <b>파이썬연습</b> 폴더 안에 <b>샘플</b> 폴더가 생깁니다. 그 안에 파일 8개가 들어 있어요.</p>
+
+<p style="font-size:16px;">앞에서 배운 리스트와 for가 그대로 들어 있죠? 이름 8개를 하나씩 꺼내 빈 파일을 만든 것입니다.</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▣ 처음 보는 줄만 짧게</h3>
+
+<ul style="font-size:16px;">
+<li><code>from pathlib import Path</code>: 파일과 폴더를 다루는 도구를 꺼내 옵니다.</li>
+<li><code>Path(__file__).parent</code>: '이 코드 파일이 있는 폴더'를 뜻합니다. 그래서 코드 파일을 꼭 저장한 뒤 실행해야 해요.</li>
+<li><code>/ "샘플"</code>: 그 폴더 안의 '샘플' 폴더라는 뜻입니다. 나눗셈이 아니에요.</li>
+<li><code>mkdir</code>는 폴더를, <code>touch</code>는 빈 파일을 만듭니다. <code>exist_ok=True</code>를 붙여서 이미 있어도 오류가 나지 않아요.</li>
+</ul>
+
+<p style="font-size:16px;">만든 파일은 이름만 있는 <b>빈 파일</b>입니다. 엑셀로 열면 오류가 날 수 있어요. 이름 연습용으로만 쓰세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">4단계: 폴더에서 이름 뽑기</h2>
+
+<p style="font-size:16px;">이번 편의 본론입니다. 같은 폴더에 <b>file_list.py</b>로 저장하고 F5를 누르세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from pathlib import Path
+
+folder = Path(__file__).parent / "샘플"
+files = sorted(folder.iterdir())
+
+for file in files:
+    print(file.name)
+
+print(f"모두 {len(files)}개")</code></pre>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (05-실행-결과.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><code>folder.iterdir()</code>는 폴더 안에 든 것을 모두 가져옵니다.</li>
+<li><code>sorted( )</code>는 가나다순으로 줄을 세웁니다. 파이썬 공식 문서에 따르면 <code>iterdir()</code>만 쓰면 순서가 정해져 있지 않아요.</li>
+<li><code>file.name</code>은 경로를 뺀 파일 이름만 꺼냅니다.</li>
+<li>마지막 줄은 1편에서 배운 글자 끼워 넣기(f)입니다. 리스트의 칸 수를 문장 안에 넣었어요.</li>
+</ul>
+
+<p style="font-size:16px;">정렬은 숫자가 먼저, 한글은 가나다순으로 나옵니다. 탐색기 정렬과 조금 다를 수 있어요.</p>
+
+<p style="font-size:16px;">샘플 폴더에 들어 있는 것이 폴더라면 그 이름도 함께 나옵니다. 폴더만 빼는 방법은 4편에서 다룹니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">목록을 엑셀로 옮기려면?</h2>
+
+<p style="font-size:16px;">Shell 창의 결과는 보통 글자처럼 복사할 수 있습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 엑셀에 붙이기 (06-엑셀에-붙이기.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li>Shell 창에서 파일 이름 줄들을 마우스로 끌어 선택합니다.</li>
+<li><b>Ctrl+C</b>로 복사합니다.</li>
+<li>엑셀의 A1 칸을 누르고 <b>Ctrl+V</b>로 붙입니다. 한 줄이 한 칸씩 들어가요.</li>
+</ul>
+
+<p style="font-size:16px;">결과를 엑셀 파일로 바로 저장하는 방법은 10편에서 다룹니다. 지금은 복사만으로 충분해요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<p style="font-size:16px;">오류 메시지는 맨 아랫줄부터 보세요. 이번 편에서 자주 나는 것은 네 가지입니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 (07-안-될-때.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><code>IndentationError: expected an indented block</code> — for 아래 줄을 들여쓰지 않았어요. 스페이스 4칸을 넣으세요.</li>
+<li><code>SyntaxError: expected ':'</code> — for 줄 끝의 쌍점(:)이 빠졌습니다.</li>
+<li><code>FileNotFoundError</code>와 '지정된 경로를 찾을 수 없습니다' — 샘플 폴더가 없어요. 3단계 코드를 먼저 실행했는지, 두 코드 파일이 같은 폴더에 있는지 확인하세요.</li>
+<li><code>NameError: name '__file__' is not defined</code> — 코드를 Shell 창에 한 줄씩 넣었을 때 납니다. 새 파일에 쓰고 저장한 뒤 F5로 실행하세요.</li>
+</ul>
+
+<p style="font-size:16px;">리스트에서 없는 번호를 부르면 <code>IndexError: list index out of range</code>가 납니다. 세 칸짜리에서 <code>names[3]</code>을 부른 경우예요. 번호는 0부터라는 것을 떠올리세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">오늘의 미션</h2>
+
+<ul style="font-size:16px;">
+<li><code>print(file.name)</code>을 <code>print(file.name, file.suffix)</code>로 바꿔 보세요. 이름 옆에 <b>.xlsx</b>, <b>.pdf</b> 같은 확장자가 붙어 나옵니다.</li>
+<li>3단계 리스트에 이름 하나를 더 넣고 다시 실행해 보세요. 4단계 결과가 '모두 9개'로 바뀌는지 확인합니다.</li>
+<li>1단계 코드에서 <code>names[0]</code>을 <code>names[2]</code>로 바꿔 보세요. 무엇이 나올지 먼저 맞혀 보고 실행합니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">목록을 볼 수 있으면, 바꿀 수도 있습니다</h2>
+
+<p style="font-size:16px;">오늘은 이름을 담고(리스트), 하나씩 꺼내(for), 폴더에서 가져왔습니다.</p>
+
+<p style="font-size:16px;">다음 3편에서는 이 목록을 한 걸음 더 씁니다. 꺼낸 이름마다 <b>앞에 날짜를 붙여 한 번에 바꿔</b> 봅니다. 1편의 날짜 이름표가 다시 나와요.</p>
+
+<p style="font-size:16px;">파일 이름을 실제로 바꾸는 편이라, 바꾸기 전에 미리보기부터 출력하는 습관도 함께 들입니다.</p>
