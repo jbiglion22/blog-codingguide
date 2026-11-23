@@ -1,0 +1,132 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: 아두이노·라즈베리파이·마이크로비트, 처음엔 무엇으로?
+검색 설명: 코딩 교육에서 자주 듣는 아두이노, 라즈베리파이, 마이크로비트. 셋은 무엇이 다르고 처음엔 무엇으로 시작하면 좋을까? '작은 두뇌'와 '작은 컴퓨터'의 차이, 시작할 때 필요한 준비물, 목적별로 고르는 법을 정리했다.
+카테고리: 아두이노·라즈베리파이
+태그: #아두이노 #라즈베리파이 #마이크로비트 #코딩교육 #피지컬컴퓨팅 #초등코딩 #메이커교육 #라즈베리파이피코 #블록코딩 #아두이노입문
+글자 수: 본문 공백 포함 2,203자 / 공백 제외 1,740자 (빨간 글씨 이미지 표시·줄바꿈 제외, 2026.11.23)
+분량 기준: 3,000자 이하. 한 편.
+형식: 단독 글(연재와 별개). 독자는 무엇으로 시작할지 고민하는 학생·학부모·선생님. 두이 캐릭터는 쓰지 않음.
+본문 글자 크기: 16px. 소제목 h2 24px(위 구분선), h3 18px 앞에 ◈ 기호(글 안에서 모두 같음). '한 줄로 말하면'만 보라(#5b4fc4) 강조.
+발행 시점: 기한 없음.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '(링크 자리)' 두 줄은 11/23 아두이노 키트 고르는 법 글·아두이노 기초 1편 링크로 바꾼다.
+
+[계기]
+- 같은 날 '아두이노' 소재 제안 4개 중 4번(카테고리 이름이 '아두이노·라즈베리파이'인데 라즈베리파이 글이 없음). 사용자가 3번(키트 고르기)에 이어 이 제목으로 쓰라고 함.
+
+[이미지 순서] (각 이미지가 무엇을 이해시키는지)
+01-타이틀.png (ChatGPT 제작, 1:1, '셋 중 무엇으로 / 시작할까?' + 보드 이름 라벨 세 개(마이크로비트·아두이노·라즈베리파이, 사용자 요청), 라벤더 책상 위 로고 없는 보드 세 개, 글자 정확, 윗줄 약 83%라 크기만 1254 → 1080px, 원본 scratchpad/backup/three-01-original.png) — 글의 주제
+02-작은-두뇌-작은-컴퓨터.png (AI, 4:5) — 마이크로컨트롤러(전원 넣으면 프로그램 하나를 바로 반복)와 작은 컴퓨터(운영체제가 켜지고 여러 프로그램)의 차이
+03-마이크로비트-생김새.png (ChatGPT 실사풍, 사용자 요청으로 CC0 사진에서 바꿈, 3:2, 로고 없는 보드 앞면 + 이름표 'LED 25개'·'버튼 A'·'버튼 B'·'연결 핀' 정확, 1536×1024 → 1620×1080, 원본 scratchpad/backup/three-03-original.png, CC0 버전 three-03-cc0.png) — 처음 보는 사람이 마이크로비트가 어떻게 생겼는지(LED 25개·버튼 A·B·연결 핀)
+04-아두이노-생김새.png (위키미디어 CC0 사진 + AI 이름표, 3:2) — 우노 호환 보드의 생김새(USB 단자·핀 소켓·두뇌 칩·전원 잭)
+05-라즈베리파이-생김새.png (위키미디어 CC0 사진 + AI 이름표, 3:2) — 라즈베리파이의 생김새(핀 40개·USB 단자·두뇌 칩·HDMI)
+06-시작할-때-필요한-것.png (AI, 1:1) — 세 보드를 처음 켜기까지 무엇이 더 필요한지 나란히
+07-목적별-고르기.png (AI, 4:5) — 하고 싶은 것에서 출발해 어느 보드로 가면 되는지
+08-함께-보면-좋은-글.png (공통 배너 밝은색)
+※ AI 도식 디자인: 연한 라벤더 바탕(#f3f1fb)·짙은 남보라 글자(#2a2550)·보드별 색(마이크로비트 보라 #5b4fc4, 아두이노 청록 #0f8b8d, 라즈베리파이 진분홍 #c8385a), 둥근 판과 칩 아이콘. 실제 로고·상표 모양은 그리지 않음. 앞 글(아두이노 키트 민트·청록, 급락장 세이지)과 다르게 함. 02 위아래 두 흐름, 03 세 기둥, 04 갈림길.
+※ 워터마크 없음.
+
+[근거 — 2026년 11월 23일]
+- micro:bit 공식(microbit.org overview, support.microbit.org V2 안내, tech.microbit.org 2.0 revision, makecode.microbit.org): 5×5 LED, A·B 버튼, 가속도·자기(나침반) 센서, V2는 스피커·마이크·터치 로고 추가, nRF52833 칩, 블루투스와 micro:bit끼리의 무선, MakeCode 블록과 Python 편집기(브라우저).
+- Raspberry Pi 공식(raspberrypi.com documentation, 27W USB-C 전원 제품 안내): Pi 5는 27W USB-C 전원(5V 5A) 권장, 다른 전원이면 USB 장치 전력 제한, 시작하려면 운영체제를 설치한 저장 매체가 필요.
+- 아두이노 공식: 지난 글(아두이노 키트 고르는 법)의 근거와 같음(우노 5V 동작).
+- 일반 지식(원문 미대조): 라즈베리파이 GPIO는 3.3V 신호라 5V 부품을 그대로 이으면 안 될 수 있음, 시작 저장 매체는 보통 마이크로SD, 라즈베리파이 피코는 마이크로컨트롤러 보드, micro:bit는 AAA 건전지 두 개 전원 상자로도 동작, 아두이노 언어는 C/C++ 바탕.
+- 가격·판매처는 쓰지 않음.
+
+[이미지 저작권] (본문에는 출처를 쓰지 않음, 사용자 요청으로 2026-11-23 세 보드 사진 추가)
+- 03: 처음엔 https://commons.wikimedia.org/wiki/File:Micro-bit_v1_%26_v2.JPG (CC0)를 썼다가, 사용자 요청으로 ChatGPT 실사 그림으로 바꿈
+- 04: https://commons.wikimedia.org/wiki/File:Noname_clone_of_Arduino_Uno_-_top.jpg (CC0) — 같은 방식
+- 05: https://commons.wikimedia.org/wiki/File:Raspberry_Pi_3_Model_B.jpg (CC0) — 같은 방식
+- 이름표 스크립트 scratchpad/zan/boards_label.py
+-->
+
+<p style="font-size:16px;">코딩 교육 이야기를 듣다 보면 세 이름이 꼭 나옵니다. 아두이노, 라즈베리파이, 마이크로비트.</p>
+<p style="font-size:16px;">셋 다 손바닥만 한 보드인데, 무엇이 다르고 처음엔 무엇으로 시작하면 좋을까요?</p>
+
+<p>&nbsp;</p>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;color:#5b4fc4;">◈ 한 줄로 말하면</h3>
+<ul style="font-size:16px;">
+<li>마이크로비트: 컴퓨터에 꽂고 바로 블록 코딩. 코딩이 처음인 학생에게 맞습니다.</li>
+<li>아두이노: 센서·모터를 직접 이어 전자 회로를 배웁니다.</li>
+<li>라즈베리파이: 운영체제가 돌아가는 작은 컴퓨터입니다. 인터넷·카메라·파이썬을 깊게 다룰 때 씁니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">'작은 두뇌'와 '작은 컴퓨터'</h2>
+<p style="font-size:16px;">가장 큰 차이는 프로그램을 직접 실행하는 마이크로컨트롤러인지, 운영체제를 실행하는 컴퓨터인지입니다.</p>
+<p style="font-size:16px;">아두이노와 마이크로비트는 '마이크로컨트롤러' 보드입니다. 전원을 넣으면 미리 저장한 프로그램이 바로 실행됩니다.</p>
+<p style="font-size:16px;">센서 값을 읽고, LED를 켜고, 모터를 움직이는 여러 일을 그 프로그램 하나로 처리합니다.</p>
+<p style="font-size:16px;">라즈베리파이는 운영체제(리눅스)가 켜지는 작은 컴퓨터입니다. 모니터와 키보드를 이어 컴퓨터처럼 쓰고, 여러 프로그램을 함께 돌릴 수 있습니다.</p>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 작은 두뇌와 작은 컴퓨터 (02-작은-두뇌-작은-컴퓨터.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">마이크로비트, 부품 없이 바로 결과</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 마이크로비트 생김새 (03-마이크로비트-생김새.png) ]]</p>
+<p style="font-size:14px;color:#777;">마이크로비트의 생김새를 보여 주는 그림입니다. 실제 제품에는 이름과 로고가 새겨져 있습니다.</p>
+<p style="font-size:16px;">보드 위에 필요한 것이 대부분 붙어 있습니다. LED 25개, 버튼 두 개, 가속도(기울기) 센서와 나침반 센서가 기본입니다.</p>
+<p style="font-size:16px;">최신 V2에는 여기에 스피커, 마이크, 터치 로고가 더해졌습니다. 마이크로비트끼리 무선으로 메시지를 주고받을 수도 있습니다.</p>
+<p style="font-size:16px;">프로그램은 웹 브라우저에서 블록을 끌어 붙여 만들고, 익숙해지면 파이썬으로도 씁니다. 그래서 부품을 사지 않아도 첫 수업부터 결과가 바로 보입니다.</p>
+<p style="font-size:16px;">다만 모터나 여러 센서를 더 붙이려면 확장 보드가 필요합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">아두이노, 회로를 직접 만든다</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 아두이노 생김새 (04-아두이노-생김새.png) ]]</p>
+<p style="font-size:14px;color:#777;">USB-C 단자를 쓰는 우노 호환 보드입니다. 아두이노 UNO R3는 네모난 USB-B 단자를 씁니다.</p>
+<p style="font-size:16px;">보드 위에는 실습에 쓸 LED가 하나 정도뿐입니다. LED, 버튼, 센서, 모터를 브레드보드와 선으로 직접 이어야 합니다.</p>
+<p style="font-size:16px;">손이 더 가지만, 그만큼 전기가 어떻게 흐르는지, 센서 값이 어떻게 들어오는지를 몸으로 배웁니다.</p>
+<p style="font-size:16px;">프로그램은 C/C++를 바탕으로 한 아두이노 언어로 씁니다. 예제와 부품이 가장 많아 막혔을 때 답을 찾기 쉽습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">라즈베리파이, 손바닥 컴퓨터</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 라즈베리파이 생김새 (05-라즈베리파이-생김새.png) ]]</p>
+<p style="font-size:14px;color:#777;">예전 모델(라즈베리파이 3)입니다. 최신 5는 모니터 단자가 작은 마이크로 HDMI 두 개인 점 등이 다르지만, 크기와 생김새는 비슷합니다.</p>
+<p style="font-size:16px;">마이크로SD 카드 같은 저장 장치에 운영체제를 먼저 설치하고, 보드에 꽂아 전원을 켭니다. 처음 설정할 때는 모니터·키보드·마우스가 있으면 편합니다.</p>
+<p style="font-size:16px;">파이썬, 카메라, 인터넷, 간단한 웹 서버까지 컴퓨터로 할 수 있는 일을 대부분 할 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">◈ 처음에 헷갈리기 쉬운 두 가지</h3>
+<ul style="font-size:16px;">
+<li>전원: 라즈베리파이 5는 공식 안내에서 27W USB-C 전원(5V 5A)을 권합니다. 출력이 모자란 충전기를 쓰면 연결한 USB 장치의 전력이 제한될 수 있습니다.</li>
+<li>전압: 라즈베리파이의 GPIO 핀은 3.3V 신호를 씁니다. 5V 신호를 내보내는 부품을 바로 이으면 보드가 망가질 수 있어, 필요하면 전압을 바꿔 주는 레벨 변환 회로를 씁니다.</li>
+</ul>
+<p style="font-size:16px;">이름이 비슷한 '라즈베리파이 피코'는 운영체제가 없는 마이크로컨트롤러 보드입니다. 오히려 아두이노·마이크로비트와 같은 쪽입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">처음 켜기까지 무엇이 필요할까?</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 시작할 때 필요한 것 (06-시작할-때-필요한-것.png) ]]</p>
+<p style="font-size:16px;">마이크로비트는 USB 케이블과 컴퓨터만으로 시작할 수 있고, 건전지 상자를 달면 컴퓨터 없이도 돌아갑니다.</p>
+<p style="font-size:16px;">아두이노는 보드와 USB 케이블로 시작한 뒤, LED나 센서 같은 부품을 하나씩 이어 갑니다.</p>
+<p style="font-size:16px;">라즈베리파이는 운영체제를 설치한 저장 장치와 전원이 필요하고, 처음 설정할 때는 모니터·키보드·마우스가 있으면 편합니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">하고 싶은 것으로 고르자</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 목적별로 고르기 (07-목적별-고르기.png) ]]</p>
+<ul style="font-size:16px;">
+<li>코딩이 처음이고, 결과를 빨리 보고 싶다 → 마이크로비트</li>
+<li>센서로 재고 모터를 움직이는 작품을 만들고 싶다 → 아두이노</li>
+<li>인터넷·카메라·파이썬으로 컴퓨터처럼 쓰고 싶다 → 라즈베리파이</li>
+</ul>
+<p style="font-size:16px;">셋은 경쟁 관계라기보다 계단에 가깝습니다. 마이크로비트로 코딩에 익숙해지고, 아두이노로 회로를 배우고, 라즈베리파이로 넓혀 가는 길이 자연스럽습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">학교에서 쓰는 보드부터 물어보기</h2>
+<p style="font-size:16px;">학교 수업이나 방과후 교실에서 이미 쓰는 보드가 있다면 그것부터 맞추는 게 좋습니다. 수업 자료를 집에서 그대로 다시 해 볼 수 있습니다.</p>
+<p style="font-size:16px;">따로 정해진 것이 없다면, 하고 싶은 것 하나를 먼저 정하고 위의 길을 따라 고르면 됩니다.</p>
+
+<p>&nbsp;</p>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (08-함께-보면-좋은-글.png) ]]</p>
+<p style="font-size:16px;">(링크 자리) 아두이노 키트 고르는 법, 처음엔 무엇을 살까?</p>
+<p style="font-size:16px;">(링크 자리) [아두이노 기초 #1] 아두이노가 뭘까, 무엇을 준비할까</p>
