@@ -1,0 +1,120 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: 마이크로비트 사기 전에 알아 둘 7가지, 몇 살부터·무엇을 살까?
+검색 설명: 교육용 보드 마이크로비트(micro:bit)를 사기 전에 궁금한 것들을 정리했다. 몇 살부터 쓸 수 있는지, 사면 바로 해 볼 수 있는 것, V1과 V2의 차이와 구별법, 보드만 살지 세트로 살지, 설치 없이 어떤 기기로 코딩할 수 있는지, 아두이노와의 차이, 다룰 때 주의할 점까지.
+카테고리: 아두이노·라즈베리파이
+태그: #마이크로비트 #microbit #마이크로비트V2 #마이크로비트구매 #코딩교육 #블록코딩 #메이크코드 #초등코딩 #피지컬컴퓨팅 #코딩교구
+글자 수: 본문 공백 포함 2,160자 / 공백 제외 1,677자 (빨간 글씨 이미지 표시·줄바꿈 제외, 2026.11.23)
+분량 기준: 4,000자 이내. 한 편.
+본문 글자 크기: 16px. 소제목 h2 24px(위 구분선), h3 18px 앞에 ◆ 기호(글 안에서 모두 같음). 처음 h3 '한눈에 보면'만 청록(#0e8a8a) 강조.
+독자: 사기 전인 학부모·선생님과 어른 입문자(정보 글 형식). 사용자 결정: '구매 전인 사람이 궁금한 것' 방향.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '함께 보면 좋은 글' 배너 아래 링크 자리 줄을 11/23 「아두이노·라즈베리파이·마이크로비트, 처음엔 무엇으로?」 링크로 바꾼다.
+
+[이미지 순서] 크기는 그림마다 내용에 맞게. 디자인(AI 도식): 옅은 민트 바탕(#f0f7f6)·흰 카드·청록(#0e8a8a)과 노랑(#f0b020) 강조, 머리에 5×5 LED 점 무늬 일부(앞 아리바이오 글의 연보라와 다르게).
+01-타이틀.png (ChatGPT, 1:1 1080×1080, '마이크로비트 / 사기 전에 알 것', 하트 LED 보드·건전지 상자·케이블·종이 쇼핑백, 로고 없음, 글자 정확. 둘째 줄 약 86%라 96%로 줄이고 흐린 원본 위에 40px로 섞음(약 83%), 원본 scratchpad/backup/mbit-01-original.png)
+02-보드-앞뒤.png (ChatGPT 실사풍 + 이름표, 가로 1600×800, 앞면 LED 25개·버튼 A·B·터치 로고·연결 핀, 뒷면 USB 단자·건전지 연결·스피커, 로고·인쇄 글자 없음, 이름표 정확, 원본 scratchpad/backup/mbit-02-original.png) — 처음 보는 보드의 앞면·뒷면에 무엇이 있는지
+03-V1-V2-차이.png (AI, 가로 1440×1050, 두 칸 체크 비교) — V2에만 있는 스피커·마이크·터치 로고
+04-구성-세-가지.png (AI, 가로 1500×910, 세 칸 비교) — 보드만·기본 세트·확장 키트에 무엇이 들었는지
+05-기기별-연결.png (AI, 세로 1080×1146, 목록) — 기기마다 USB로 되는지, 블루투스 앱이 필요한지
+06-함께-보면-좋은-글.png (공통 배너 밝은색) — 아래 링크 자리: 세 보드 비교 글
+스크립트: scratchpad/zan/mbit.py
+
+[근거 — 2026년 11월 23일 확인, 공식 자료]
+- 나이: microbit.org 'What is the micro:bit?' — "designed for young people ages 8+", MakeCode 블록 코딩 "ages 8+", Python 텍스트 코딩 "ages 11+"(내장 브라우저로 원문 확인). 편집기는 여러 언어로 쓸 수 있다는 안내(같은 페이지).
+- V2 추가 기능: 내장 스피커, 마이크(표시등 포함), 터치 로고, 절전·꺼짐 기능, 더 빠른 칩과 큰 메모리. 구별: 뒷면 'V2' 표시, 뒷면 MICROPHONE·SPEAKER 표시, 앞면 로고가 금색, 가장자리 연결부에 홈 — support.microbit.org 'Details of micro:bit V2', 'What is a micro:bit?'.
+- 호환: 원래 기능만 쓰는 프로그램은 두 버전 모두에서 동작, V1은 소리를 들으려면 이어폰·스피커를 따로 연결. 예전 파일은 편집기에서 다시 열어 저장해야 V2에서 동작 — microbit.org/new-microbit FAQ. 공식 판매 목록(microbit.org/buy)에는 V2만 보임(V1 단종 공식 문구는 못 찾아 '새 제품은 V2'로만 씀).
+- 기기: 공식 편집기(MakeCode·Python)는 브라우저에서 동작, Windows·Mac·크롬북(ChromeOS)·Linux, 설치 불필요. USB로 바로 내려받기(WebUSB)는 Windows·macOS·ChromeOS·Android·Linux(검수 반영으로 본문에 리눅스·안드로이드 USB도 씀). 아이패드·아이폰은 USB 불가, 블루투스로 micro:bit 앱 사용. 안드로이드는 USB 또는 블루투스 앱 — support.microbit.org.
+- 세트: 'BBC micro:bit Go' = V2 보드 1(색 무작위), micro USB 케이블 1, 배터리 팩 1, AAA 건전지 2, 빠른 시작 안내, 안전 안내 — microbit.org/buy/bbc-microbit-go. 보드만 파는 'Single'도 있음. 케이블은 데이터 전송이 되는 것이어야 함.
+- 안전: 가장자리를 잡고 전원이 켜진 동안 부품을 만지지 않기, 함께 온 배터리 팩·USB 케이블로만 전원, 안 쓸 때는 정전기 방지 봉투, 만지기 전 금속을 잠깐 만져 정전기 빼기, 손상된 보드는 쓰지 않기, 보조배터리·충전 전용 USB 포트 피하기(검수 의견) — microbit.org 안전 안내.
+- 가격은 판매처마다 달라 숫자로 쓰지 않음. 아두이노와의 차이는 11/23 비교 글 근거(일반 지식).
+-->
+
+<p style="font-size:16px;">학교 코딩 수업이나 방과후 교실에서 '마이크로비트'라는 작은 보드를 쓴다는 이야기를 듣게 됩니다.</p>
+<p style="font-size:16px;">집에서도 하나 사 줄까 고민된다면, 사기 전에 많이 묻는 것들을 순서대로 정리했습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;color:#0e8a8a;">◆ 한눈에 보면</h3>
+<ul style="font-size:16px;">
+<li>블록 코딩은 8세 이상, 글자로 쓰는 파이썬은 11세 이상이 공식 안내입니다.</li>
+<li>새로 산다면 V2를 고르고, 처음이면 건전지·케이블이 든 세트가 편합니다.</li>
+<li>컴퓨터에 프로그램을 설치하지 않고 인터넷 창에서 바로 코딩합니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">1. 마이크로비트는 무엇이고, 몇 살부터 쓸까?</h2>
+<p style="font-size:16px;">마이크로비트는 손바닥 반만 한 교육용 컴퓨터 보드입니다. 영국 BBC가 주도한 코딩 교육 프로젝트에서 출발했고, 지금은 비영리 단체인 마이크로비트 교육재단이 보급과 교육을 이어 가고 있습니다.</p>
+<p style="font-size:16px;">보드 하나에 작은 LED 25개, 버튼 두 개, 여러 센서가 이미 붙어 있습니다. 부품을 따로 연결하지 않아도 바로 무언가를 만들어 볼 수 있습니다.</p>
+<p style="font-size:16px;">공식 안내는 8세 이상입니다. 블록을 끌어다 맞추는 코딩은 8세부터, 글자로 쓰는 파이썬은 11세부터를 권합니다. 스크래치나 엔트리를 해 봤다면 블록 방식이 금방 익숙해집니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 마이크로비트 앞면과 뒷면 (02-보드-앞뒤.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">2. 사면 바로 해 볼 수 있는 것</h2>
+<p style="font-size:16px;">보드에 붙은 것만으로도 할 수 있는 일이 꽤 많습니다.</p>
+<ul style="font-size:16px;">
+<li><b>LED:</b> 이름이나 하트 같은 그림 띄우기</li>
+<li><b>버튼:</b> 누르면 주사위 숫자가 나오는 전자 주사위</li>
+<li><b>기울기 센서:</b> 흔든 횟수를 세는 만보기</li>
+<li><b>나침반·온도·밝기:</b> 방향 표시, 방 온도 재기</li>
+<li><b>무선:</b> 마이크로비트 두 대끼리 메시지 주고받기</li>
+</ul>
+<p style="font-size:16px;">익숙해지면 집게 전선으로 LED나 모터를 연결해 더 큰 작품으로 넓혀 갈 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">3. V1과 V2, 무엇을 살까?</h2>
+<p style="font-size:16px;">마이크로비트는 처음 나온 V1과 2020년에 나온 V2가 있습니다. V2에는 스피커, 마이크, 손가락을 대면 반응하는 로고가 더해졌고, 칩도 더 빨라졌습니다.</p>
+<p style="font-size:16px;">공식 판매 목록에는 V2만 있어, 새로 산다면 V2입니다. 중고로 V1을 구할 수도 있지만, V2에 들어 있는 스피커와 마이크가 없습니다. V1에서 소리를 내려면 외부 스피커 등을 연결해야 하고, 내장 마이크로 소리를 듣는 활동은 할 수 없습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: V1과 V2 차이 (03-V1-V2-차이.png) ]]</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">◆ V2인지 어떻게 알아볼까?</h3>
+<p style="font-size:16px;">뒷면 아래쪽에 'V2'라고 적혀 있고, 마이크와 스피커 표시가 있습니다. 앞면 로고가 금색이고, 아래쪽 연결부 가장자리에 작은 홈이 있으면 V2입니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">4. 보드만? 세트? 무엇을 사야 할까?</h2>
+<p style="font-size:16px;">파는 형태는 크게 세 가지입니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 무엇을 살까? 세 가지 구성 (04-구성-세-가지.png) ]]</p>
+
+<p style="font-size:16px;">처음이라면 공식 'Go' 세트처럼 보드, 케이블, 배터리 팩, 건전지가 함께 든 구성이 편합니다. 보드만 사면 케이블과 건전지 상자를 따로 챙겨야 합니다.</p>
+<p style="font-size:16px;">케이블은 충전만 되는 것이 아니라 자료가 오가는 케이블이어야 합니다. 집에 있는 아무 케이블로는 프로그램이 안 들어갈 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">5. 설치가 필요할까? 어떤 기기로 할까?</h2>
+<p style="font-size:16px;">공식 편집기는 인터넷 창(브라우저)에서 바로 열립니다. 따로 설치할 프로그램이 없고, 편집기 화면은 한국어로도 쓸 수 있습니다.</p>
+<p style="font-size:16px;">윈도·맥·리눅스 컴퓨터와 크롬북은 USB 케이블로 프로그램을 보낼 수 있습니다. 안드로이드 기기도 맞는 케이블이나 젠더를 쓰면 USB로 연결할 수 있고, 전용 앱으로 블루투스 전송도 됩니다.</p>
+<p style="font-size:16px;">아이패드와 아이폰은 USB 전송을 지원하지 않아, 전용 앱을 설치해 블루투스로 프로그램을 보냅니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 어떤 기기로 코딩할 수 있을까? (05-기기별-연결.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">6. 아두이노와 무엇이 다를까?</h2>
+<p style="font-size:16px;">아두이노는 보드에 부품이 거의 없어, 전선과 부품을 직접 연결하며 배웁니다. 회로를 이해하기 좋지만 시작이 조금 번거롭습니다.</p>
+<p style="font-size:16px;">마이크로비트는 필요한 것이 보드에 이미 들어 있어, 꺼내자마자 결과를 볼 수 있습니다. 처음 코딩을 접한다면 마이크로비트로 간단한 작품을 만들어 보고, 회로와 부품을 직접 다루는 데 관심이 생기면 아두이노를 살펴볼 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">7. 장바구니에 담기 전 확인할 것</h2>
+<ul style="font-size:16px;">
+<li><b>버전:</b> 상품 설명이나 사진에 V2라고 적혀 있는지</li>
+<li><b>구성:</b> 케이블·배터리 팩·건전지가 들어 있는지</li>
+<li><b>기기:</b> 집에서 쓸 기기가 아이패드라면 블루투스 앱으로 해야 한다는 점</li>
+<li><b>학교:</b> 수업에서 쓰는 버전과 편집기가 무엇인지 선생님께 물어보기</li>
+</ul>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">◆ 아이가 다룰 때 주의할 점</h3>
+<p style="font-size:16px;">마이크로비트는 부품이 그대로 드러난 보드입니다. 전원이 켜진 동안에는 가장자리를 잡고, 부품을 손으로 만지지 않게 해 주세요.</p>
+<p style="font-size:16px;">전원은 함께 제공된 배터리 팩이나 USB 케이블을 씁니다. 보조배터리나 충전 전용 USB 포트에는 연결하지 않는 것이 좋습니다. 안 쓸 때는 정전기 방지 봉투에 넣어 두고, 금이 가거나 망가진 보드는 쓰지 않습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (06-함께-보면-좋은-글.png) ]]</p>
+<p style="font-size:16px;">(링크 자리: 아두이노·라즈베리파이·마이크로비트, 처음엔 무엇으로?)</p>
