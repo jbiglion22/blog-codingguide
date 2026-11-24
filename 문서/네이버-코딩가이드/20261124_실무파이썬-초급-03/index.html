@@ -1,0 +1,208 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [실무 파이썬 초급 3강] 파일 이름 한 번에 바꾸기
+독자: 코딩을 해 본 적 없는 직장인. 윈도우 PC 기준. 1편(날짜 이름표)과 2편(리스트·for, 샘플 폴더)을 본 사람.
+검색 설명: 실무 파이썬 초급 연재 3편. 폴더 속 파일 이름 앞에 오늘 날짜를 붙여 한 번에 바꾼다. 바꾸기 전에 바뀔 이름을 먼저 출력해 보는 미리보기 습관, 두 번 실행하면 날짜가 두 번 붙는 이유, 파일이 열려 있거나 같은 이름이 있을 때 나는 오류까지 정리했다.
+카테고리: 파이썬 코딩
+태그: #파이썬 #파이썬기초 #파이썬초보 #파이썬업무자동화 #업무자동화 #직장인 #파일이름변경 #파일이름일괄변경 #pathlib #엑셀자동화
+글자 수: 본문 공백 포함 3,295자 / 공백 제외 2,708자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.24)
+본문 글자 크기: 16px. 소제목 h2 24px, h3 18px + 기호 ▶(이 글 안에서는 모두 같은 기호).
+연재: 「초보도 업무에서 바로 쓰는 파이썬」 초급 3편(목차·규칙은 저장소 루트 '네이버-코딩가이드-실무파이썬-연재.md'). 이전 편: 초급 2편 「폴더 속 파일 이름 한눈에 보기」.
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+
+[이미지 순서와 각 그림이 이해시키는 것]
+01-타이틀.png (ChatGPT, 1:1 1080×1080) — 배지 '파이썬 초급 3강' + '파일 이름 / 한 번에 바꾸기'. 받은 그림이 위로 치우쳐(중심 약 40%) 95%로 줄이고 아래로 내려 중심 약 50%·가장 넓은 줄 약 82%로 맞춤
+02-바뀌기-전과-후.png (AI, 1080×1448 세로) — 8개 이름이 한 번에 '날짜_원래 이름'으로 바뀐 완성 모습(날짜 부분 주황)
+03-미리보기-먼저.png (AI, 1440×811 가로) — 미리보기 → 눈으로 확인 → 한 번만 바꾸기, 세 단계를 나란히
+04-실행-결과.png (AI, 1080×1517 세로) — rename.py 코드(새 한 줄 노란 표시)와 실제 출력
+05-두-번-실행하면.png (AI, 1080×1061) — 두 번 실행하면 날짜가 두 번 붙는 모습(경고)
+06-안-될-때.png (AI, 1080×1120) — 실제 오류 세 가지와 고치는 법, 멈춘 곳 앞은 이미 바뀜
+디자인: 2편과 같은 흰 바탕·남색 글씨·노란 화살표·NanumGothicCoding 코드 글씨, 날짜 부분만 주황(#c0560a). 테두리는 02 카드·03 왼쪽 띠·04 겹선·05 꺾쇠·06 얇은 선. 스크립트 scratchpad/py3/img3.py.
+
+[근거 — 공식 문서와 실행 확인] 2026년 11월 24일
+- 「pathlib」 https://docs.python.org/3/library/pathlib.html : Path.rename(target)은 파일 이름(위치)을 바꾸고 새 Path를 돌려줌. 윈도우에서는 target이 이미 있으면 FileExistsError. target이 상대 경로면 Path 객체의 폴더가 아니라 '현재 작업 폴더' 기준으로 해석. PurePath.stem은 확장자를 뺀 이름.
+- IDLE의 Run Module은 작업 폴더를 코드 파일이 있는 폴더로 바꾼다(2편에서 idlelib/runscript.py로 확인). 그래서 file.rename(new_name)만 쓰면 파일이 파이썬연습 폴더로 옮겨진다.
+- 코드 확인(윈도우 11·Python 3.14.5, 코드 파일 폴더에서 실행): preview.py 출력 8줄(파일은 그대로), rename.py 출력 8줄과 '8개를 바꿨습니다.', 두 번 실행하면 20261124_20261124_1월_매출.xlsx, folder / 없이 쓰면 파일 8개가 코드 폴더로 옮겨짐, 미션 세 가지(%Y-%m-%d → 2026-11-24_1월_매출.xlsx, stem·suffix → 1월_매출_20261124.xlsx, 검토완료_1월_매출.xlsx).
+- 오류는 실제로 낸 것: 3월_매출.xlsx를 다른 프로세스(파이썬)가 열어 둔 채 실행 → 1·2월만 바뀌고 PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다. / 20261124_1월_매출.xlsx를 미리 만들어 두고 실행 → FileExistsError: [WinError 183] 파일이 이미 있으므로 만들 수 없습니다. 엑셀이 파일을 열어 두었을 때도 같은 오류가 나는지는 엑셀로 직접 확인하지 못해 '엑셀 등에서'로 썼다.
+- 'Ctrl+Z로 되돌리기'는 탐색기에서 한 작업만 되돌린다는 일반 지식으로, 공식 문서로 확인하지 못해 '돌릴 수 없다고 생각하는 게 안전'으로 썼다.
+- 연습을 다시 하는 법은 if 없이 할 수 있게 '샘플 폴더 삭제 → make_samples.py 다시 실행'으로 안내(빈 연습 파일만 해당, 업무 파일은 지우지 말라고 밝힘).
+- 앞으로 쓸 약속: 이미 날짜가 붙은 파일 건너뛰기와 폴더 빼기는 4편(if).
+-->
+
+<p style="font-size:16px;">"받은 파일은 이름 앞에 날짜를 붙여서 보관해 주세요."</p>
+
+<p style="font-size:16px;">파일이 몇 개면 금방입니다. 수십 개라면 이야기가 달라지죠.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">「초보도 업무에서 바로 쓰는 파이썬」 초급 3편입니다.</p>
+
+<p style="font-size:16px;">오늘은 폴더 속 파일 이름 앞에 오늘 날짜를 붙여, <b>한 번에</b> 바꿔 봅니다.</p>
+
+<p style="font-size:16px;">1편의 날짜 만들기와 2편의 for가 그대로 다시 나옵니다. 새로 배우는 것은 이름을 바꾸는 한 줄뿐이에요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">결과부터 보기</h2>
+
+<p style="font-size:16px;">2편에서 만든 <b>샘플</b> 폴더의 파일 8개가 이렇게 바뀝니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 바뀌기 전과 후 (02-바뀌기-전과-후.png) ]]</p>
+
+<p style="font-size:16px;">날짜는 코드를 실행한 날로 붙습니다. 이 글의 예시는 2026년 11월 24일에 실행한 결과예요.</p>
+
+<p style="font-size:16px;">샘플 폴더가 없다면 2편의 <b>make_samples.py</b>를 먼저 실행하세요. 빈 연습 파일 8개가 만들어집니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">왜 미리보기부터 할까?</h2>
+
+<p style="font-size:16px;">코드로 바꾼 이름은 탐색기의 되돌리기(Ctrl+Z)로 돌릴 수 없다고 생각하는 게 안전합니다.</p>
+
+<p style="font-size:16px;">그래서 코드를 두 개로 나눕니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 미리보기 먼저 (03-미리보기-먼저.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><b>미리보기 코드</b>: 바뀔 이름을 화면에 보여 주기만 합니다. 파일은 그대로예요.</li>
+<li><b>바꾸기 코드</b>: 미리보기가 마음에 들 때만, <b>한 번</b> 실행합니다.</li>
+</ul>
+
+<p style="font-size:16px;">실제 업무 파일이라면 폴더를 통째로 복사해 두고 복사본에서 먼저 해 보세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">1단계: 바뀔 이름 미리보기</h2>
+
+<p style="font-size:16px;"><b>파이썬연습</b> 폴더에 <b>preview.py</b>로 저장하고 F5를 누르세요. make_samples.py와 같은 폴더여야 합니다.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from datetime import date
+from pathlib import Path
+
+folder = Path(__file__).parent / "샘플"
+stamp = date.today().strftime("%Y%m%d")
+
+for file in sorted(folder.iterdir()):
+    new_name = f"{stamp}_{file.name}"
+    print(file.name, "→", new_name)</code></pre>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>1월_매출.xlsx → 20261124_1월_매출.xlsx
+2월_매출.xlsx → 20261124_2월_매출.xlsx
+3월_매출.xlsx → 20261124_3월_매출.xlsx
+거래처_목록.xlsx → 20261124_거래처_목록.xlsx
+견적서_A사.pdf → 20261124_견적서_A사.pdf
+견적서_B사.pdf → 20261124_견적서_B사.pdf
+행사_사진.jpg → 20261124_행사_사진.jpg
+회의록_1105.docx → 20261124_회의록_1105.docx</code></pre>
+
+<p style="font-size:16px;">실행한 뒤 탐색기에서 샘플 폴더를 열어 보세요. 이름은 하나도 바뀌지 않았습니다.</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▶ 모두 앞에서 배운 줄입니다</h3>
+
+<ul style="font-size:16px;">
+<li><code>stamp</code>: 1편에서 배운 오늘 날짜입니다. <code>%Y%m%d</code>라서 <b>20261124</b> 모양이 돼요.</li>
+<li><code>for file in sorted(...)</code>: 2편의 파일 목록을 하나씩 꺼냅니다.</li>
+<li><code>new_name</code>: f-string으로 '날짜_원래 이름'을 만든 새 이름표예요.</li>
+<li><code>print(a, "→", b)</code>: 쉼표로 이은 값들은 한 칸씩 띄어 한 줄에 나옵니다.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">2단계: 확인했으면 진짜로 바꾸기</h2>
+
+<p style="font-size:16px;">미리보기 코드에 <b>한 줄</b>을 더합니다. 같은 폴더에 <b>rename.py</b>로 저장하고 F5를 누르세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>from datetime import date
+from pathlib import Path
+
+folder = Path(__file__).parent / "샘플"
+stamp = date.today().strftime("%Y%m%d")
+
+files = sorted(folder.iterdir())
+for file in files:
+    new_name = f"{stamp}_{file.name}"
+    file.rename(folder / new_name)
+    print(new_name)
+
+print(f"{len(files)}개를 바꿨습니다.")</code></pre>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (04-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">이번에는 탐색기의 이름이 정말 바뀌어 있습니다.</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▶ 새로 나온 한 줄</h3>
+
+<ul style="font-size:16px;">
+<li><code>file.rename(새 위치)</code>: 파일의 이름(위치)을 바꿉니다.</li>
+<li><code>folder / new_name</code>: '샘플 폴더 안의 새 이름'이라는 뜻입니다. 2편의 <code>folder / name</code>과 같은 방식이에요.</li>
+</ul>
+
+<p style="font-size:16px;">여기서 <code>folder /</code>를 빼고 <code>file.rename(new_name)</code>이라고만 쓰면 어떻게 될까요?</p>
+
+<p style="font-size:16px;">파일이 샘플 폴더에서 사라집니다. 대신 코드 파일이 있는 <b>파이썬연습</b> 폴더에 새 이름으로 옮겨져 있어요.</p>
+
+<p style="font-size:16px;">파이썬 공식 문서도 폴더 없이 쓴 새 이름은 '지금 작업 중인 폴더' 기준이라고 설명합니다. IDLE에서 F5로 실행하면 그 폴더가 코드 파일이 있는 폴더예요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">두 번 실행하면 어떻게 될까?</h2>
+
+<p style="font-size:16px;">rename.py를 한 번 더 실행하면 날짜가 <b>또</b> 붙습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두 번 실행하면 (05-두-번-실행하면.png) ]]</p>
+
+<p style="font-size:16px;">코드는 시킨 대로 했을 뿐입니다. 이미 날짜가 붙은 이름인지 따져 보라고는 하지 않았으니까요.</p>
+
+<p style="font-size:16px;">'이미 붙어 있으면 건너뛰어라'를 시키려면 <b>if</b>가 필요합니다. 4편에서 배워요. 그때까지는 바꾸기 코드를 <b>한 번만</b> 실행하세요.</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▶ 연습을 처음부터 다시 하려면</h3>
+
+<ul style="font-size:16px;">
+<li>탐색기에서 <b>샘플</b> 폴더를 통째로 지웁니다.</li>
+<li>2편의 make_samples.py를 다시 실행합니다.</li>
+<li>원래 이름의 빈 파일 8개가 다시 생깁니다.</li>
+</ul>
+
+<p style="font-size:16px;">연습 파일은 빈 파일이라 이렇게 해도 괜찮습니다. 실제 업무 파일은 지우지 마세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<p style="font-size:16px;">오류 메시지는 맨 아랫줄부터 보세요. 아래는 맨 아랫줄의 앞부분만 옮긴 것이에요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 (06-안-될-때.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><code>PermissionError: [WinError 32]</code> '다른 프로세스가 파일을 사용 중' — 그 파일이 다른 프로그램에 열려 있어요. 엑셀 등에서 파일을 닫고 다시 실행하세요.</li>
+<li><code>FileExistsError: [WinError 183]</code> '파일이 이미 있으므로' — 바꾸려는 새 이름의 파일이 이미 폴더에 있습니다. 윈도우에서는 같은 이름으로 덮어쓰지 않고 멈춰요.</li>
+<li><code>FileNotFoundError</code> — 샘플 폴더를 찾지 못했어요. 2편처럼 저장 위치와 폴더 이름을 확인하세요.</li>
+</ul>
+
+<p style="font-size:16px;">오류로 멈추면 <b>그 앞의 파일들은 이미 바뀌어 있습니다.</b> 예를 들어 세 번째 파일이 열려 있으면, 앞의 두 개만 바뀌고 멈춥니다.</p>
+
+<p style="font-size:16px;">이럴 때 rename.py를 그냥 다시 실행하면 앞쪽 파일에는 날짜가 두 번 붙습니다. 연습 중이라면 샘플 폴더를 새로 만드는 쪽이 깔끔해요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">오늘의 미션</h2>
+
+<p style="font-size:16px;">미션은 모두 <b>preview.py</b>에서 해 보세요. 이름이 바뀌지 않으니 마음껏 고쳐도 됩니다.</p>
+
+<ul style="font-size:16px;">
+<li><code>%Y%m%d</code>를 <code>%Y-%m-%d</code>로 바꿔 보세요. <b>2026-11-24_1월_매출.xlsx</b>처럼 나옵니다.</li>
+<li>날짜를 뒤로 보내 보세요. new_name 줄을 <code>f"{file.stem}_{stamp}{file.suffix}"</code>로 바꾸면 <b>1월_매출_20261124.xlsx</b>가 됩니다. <code>stem</code>은 확장자를 뺀 이름이에요.</li>
+<li>날짜 대신 <b>검토완료_</b>를 붙여 보세요.</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">코드에게 '따져 보라'고 시키는 다음 걸음</h2>
+
+<p style="font-size:16px;">오늘은 미리보기로 확인하고, 한 줄을 더해 이름을 한 번에 바꿨습니다.</p>
+
+<p style="font-size:16px;">남은 숙제는 두 가지입니다. 날짜가 이미 붙은 파일은 건너뛰기, 폴더는 빼고 파일만 다루기.</p>
+
+<p style="font-size:16px;">둘 다 '이러면 이렇게 해라'를 시키는 <b>if</b>로 풀립니다. 다음 4편에서는 if로 다운로드 폴더를 종류별로 정리해 봅니다.</p>
