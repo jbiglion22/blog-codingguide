@@ -1,0 +1,121 @@
+<meta charset="utf-8">
+<!--
+[발행 메모]
+블로그: 네이버 코딩가이드
+카테고리: 아두이노·라즈베리파이
+글 제목: 라즈베리파이 사기 전에, 어떤 모델에 무엇을 같이 살까?
+태그: #라즈베리파이 #라즈베리파이5 #라즈베리파이구매 #라즈베리파이전원 #라즈베리파이피코 #라즈베리파이제로 #microSD #코딩교육 #리눅스 #아두이노라즈베리파이
+검색 설명: 라즈베리파이는 모델마다 쓰임과 따로 사야 할 준비물이 다릅니다. 라즈베리파이 5·4·Zero 2 W·키보드형·피코의 차이, 메모리 고르는 법, 모델별 전원(27W·15W)·화면 케이블·microSD 용량을 공식 문서 기준으로 정리했습니다.
+글자 수: 본문 공백 포함 2,048자 / 공백 제외 1,612자 (빨간 글씨 이미지 표시·줄바꿈 제외, 2026.11.24)
+계기: 사용자가 '라즈베리파이'를 소재로 요청, 제안 A안. 11/23 「마이크로비트 사기 전에 알 7가지」와 짝이 되는 구매 전 안내 글.
+
+[이미지 순서]
+디자인: 아주 연한 라즈베리 분홍 바탕(#fbf1f4) · 짙은 자주(#7a1f45) 글자·강조 · 보조 잎 초록(#3d8a5a) · 흰 카드와 부드러운 그림자, 머리에 작은 라즈베리 열매 아이콘(점 묶음). 형식은 종류 지도(가로)·준비물 실사(3:2)·모델별 준비물 표(가로)·고르는 순서(세로 갈림길).
+- 01-타이틀.png (ChatGPT, 1080×1080) — 표지
+- 02-라즈베리파이-종류.png (AI, 가로) — 다섯 갈래 모델이 어떻게 다른지 한눈에
+- 03-같이-살-준비물.png (ChatGPT 실사 + 이름표, 3:2) — 보드 말고 따로 사야 하는 것이 어떻게 생겼는지
+- 04-모델별-준비물.png (AI, 가로 표) — 모델마다 전원·화면 케이블·저장 장치가 어떻게 다른지
+- 05-나에게-맞는-모델.png (AI, 세로) — 하고 싶은 일로 모델 고르기
+- 06-함께-보면-좋은-글.png (AI 배너, 1600×234) — 이 글 디자인에 맞춘 배너
+
+[근거] 2026.11.24 Raspberry Pi 공식 누리집에서 확인
+- 제품 목록 https://www.raspberrypi.com/products/ : Pi 5, Pi 500·500+(키보드형), Compute Module 5, Pico 2(RP2350 마이크로컨트롤러), Zero 2 W, Pi 4 Model B 등.
+- Pi 5 제품 페이지 https://www.raspberrypi.com/products/raspberry-pi-5/ : BCM2712 2.4GHz 4코어 Cortex-A76, 메모리 1·2·4·8·16GB, 듀얼 4Kp60 HDMI, 듀얼밴드 Wi-Fi, BT 5.0, USB 3.0 2개·2.0 2개, 기가비트 이더넷, PCIe 2.0 x1(별도 M.2 HAT 필요), 5V/5A USB-C PD, RTC, 전원 버튼, 2036년 1월까지 생산. FAQ: Pi 4 전원은 힘이 부족할 수 있어 5V 5A 권장, Pi 4 케이스에 맞지 않음, 능동 냉각을 쓰면 가장 좋은 성능, 운영체제는 Trixie(현재)·Bookworm(이전)만 지원.
+- Pi 4 제품 페이지: BCM2711 1.8GHz 4코어 Cortex-A72, 메모리 1·2·3·4·8GB, 2034년 1월까지 생산.
+- Zero 2 W 제품 페이지: 1GHz 4코어 Cortex-A53, 512MB, 2.4GHz Wi-Fi, BT 4.2, mini HDMI·micro USB OTG.
+- Pi 500 제품 페이지: 키보드 안에 Pi 5급 컴퓨터, 8GB, 32GB microSD 포함, micro HDMI 2개.
+- Getting started 문서 https://www.raspberrypi.com/documentation/computers/getting-started.html : 권장 전원 Pi 5·500 5V 5A(5V 3A면 주변기기 600mA로 제한) 27W USB-C, Pi 4·400 5V 3A 15W USB-C, Zero 5V 2.5A 12.5W micro USB. 화면 케이블 Pi 4B·400·5·500·500+ micro HDMI, Zero·Zero 2 mini HDMI. microSD 권장 용량 Raspberry Pi OS(데스크톱) 32GB 이상, Lite 8GB 이상, 2TB 미만. 키보드형·키트는 OS가 이미 설치됨. Zero는 micro USB OTG 어댑터와 전원 있는 USB 허브 권장. 케이스는 금속 위 단락 방지.
+- 가격은 판매처·환율에 따라 달라 쓰지 않음(공식 미국 가격도 메모리 값 변동으로 바뀌어 왔음). 메모리 고르는 기준(2GB 가벼운 실습, 4GB 이상 데스크톱 등)은 공식 권장이 없어 본문에 '일반적으로'로만 씀.
+-->
+
+<p style="font-size:16px;">라즈베리파이를 사려고 검색하면 이름이 여러 개 나옵니다.<br>5, 4, Zero, 500, 피코까지, 무엇을 골라야 할지부터 막힙니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 라즈베리파이 사기 전에 (01-타이틀.png) ]]</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;color:#7a1f45;">▷ 한 줄로 말하면</h3>
+<p style="font-size:16px;">처음이라면 라즈베리파이 5와 전용 전원, microSD를 함께 사는 것이 가장 무난합니다.<br>다만 하고 싶은 일이 작고 가벼우면 Zero 2 W나 피코가 더 맞을 수 있습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">라즈베리파이는 종류가 몇 개일까?</h2>
+<p style="font-size:16px;">공식 판매 목록을 보면 크게 다섯 갈래로 나눌 수 있습니다.</p>
+<ul style="font-size:16px;">
+<li>라즈베리파이 5: 지금의 대표 모델, 손바닥만 한 컴퓨터</li>
+<li>라즈베리파이 4: 한 세대 전 모델, 아직 판매 중</li>
+<li>Zero 2 W: 껌 한 통 크기의 작은 컴퓨터</li>
+<li>500·500+: 키보드 안에 컴퓨터가 들어 있는 형태</li>
+<li>피코(Pico): 컴퓨터가 아니라 아두이노 같은 마이크로컨트롤러</li>
+</ul>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 라즈베리파이 종류 (02-라즈베리파이-종류.png) ]]</p>
+
+<p style="font-size:16px;">여기서 가장 헷갈리는 것이 피코입니다.<br>이름에 '라즈베리파이'가 붙지만 운영체제를 깔아 쓰는 컴퓨터가 아닙니다.</p>
+<p style="font-size:16px;">LED나 센서를 다루는 작은 두뇌라, 화면을 연결해 인터넷을 하려는 사람에게는 맞지 않습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">라즈베리파이 5와 4, 무엇이 다를까?</h2>
+<p style="font-size:16px;">공식 안내로는 라즈베리파이 5가 이전 세대보다 2~3배 빠릅니다.<br>화면 두 대를 4K로 연결할 수 있고, 전원 버튼과 시계(RTC)도 생겼습니다.</p>
+<p style="font-size:16px;">따로 파는 확장 보드를 달면 SSD를 연결해 더 빠르게 쓸 수도 있습니다.<br>라즈베리파이 4는 그보다 느리지만 권장 전원이 더 작고(15W), 오래 팔려 온 만큼 참고할 자료가 많은 편입니다.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▷ 메모리는 몇 GB로 살까?</h3>
+<p style="font-size:16px;">라즈베리파이 5는 1GB부터 16GB까지 다섯 가지가 있습니다.<br>공식 권장 기준은 따로 없습니다.</p>
+<p style="font-size:16px;">일반적으로 코딩 실습이나 센서 연결처럼 가벼운 일은 2GB 안팎으로도 충분하다고 알려져 있습니다.<br>화면을 띄워 웹 브라우저를 여러 개 쓰려면 4GB 이상을 고르는 경우가 많습니다.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">보드만 사면 켜질까?</h2>
+<p style="font-size:16px;">보드만으로는 켜지지 않습니다.<br>키보드형이나 키트가 아니라면 아래 준비물이 따로 필요합니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 같이 살 준비물 (03-같이-살-준비물.png) ]]</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▷ 전원 어댑터</h3>
+<p style="font-size:16px;">공식 문서는 라즈베리파이 5에 5V 5A, 27W USB-C 전원을 권합니다.<br>5V 3A 전원을 쓰면 USB 주변기기에 줄 수 있는 전기가 600mA로 제한됩니다.</p>
+<p style="font-size:16px;">라즈베리파이 4는 5V 3A(15W) USB-C 전원이 권장됩니다.<br>휴대폰 충전기는 출력이 맞지 않으면 전원이 모자랄 수 있으니 숫자를 꼭 확인하세요.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▷ microSD 카드</h3>
+<p style="font-size:16px;">운영체제가 들어갈 저장 장치입니다.<br>화면이 있는 Raspberry Pi OS는 32GB 이상, 화면 없는 Lite 버전은 8GB 이상이 권장됩니다.</p>
+<p style="font-size:16px;">컴퓨터에 운영체제를 구워 넣으려면 SD 카드 리더기도 있어야 합니다.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▷ 화면 케이블과 키보드·마우스</h3>
+<p style="font-size:16px;">라즈베리파이 5·4는 작은 micro HDMI 단자를 씁니다.<br>Zero 2 W는 그보다 조금 큰 mini HDMI라, 일반 HDMI 케이블은 바로 꽂히지 않습니다.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▷ 케이스와 쿨러</h3>
+<p style="font-size:16px;">공식 안내로는 라즈베리파이 5는 팬으로 식혀 줄 때 가장 좋은 성능을 냅니다.<br>팬이 들어 있는 공식 케이스나 액티브 쿨러가 있고, 라즈베리파이 4용 케이스에는 맞지 않습니다.</p>
+<p style="font-size:16px;">케이스는 금속 위에 올려 두었을 때 생기는 합선도 막아 줍니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 모델별 준비물 (04-모델별-준비물.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">하고 싶은 일로 고르면</h2>
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 나에게 맞는 모델 (05-나에게-맞는-모델.png) ]]</p>
+<ul style="font-size:16px;">
+<li>작은 컴퓨터로 코딩·리눅스를 배우고 싶다 → 라즈베리파이 5</li>
+<li>책상에 바로 두고 쓰고 싶다 → 키보드형 500(운영체제 설치된 microSD 포함)</li>
+<li>작게 숨겨 두고 한 가지 일만 시키고 싶다 → Zero 2 W</li>
+<li>LED·센서만 다루고 싶다 → 피코(컴퓨터가 아님)</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">장바구니에 담기 전, 상품 설명에서 볼 네 줄</h2>
+<ul style="font-size:16px;">
+<li>모델 이름과 메모리 용량(예: 5 · 4GB)</li>
+<li>전원 어댑터가 들어 있는지, 들어 있다면 5V 몇 A인지</li>
+<li>microSD에 운영체제가 미리 깔려 있는지</li>
+<li>화면 케이블이 micro HDMI인지 mini HDMI인지</li>
+</ul>
+<p style="font-size:16px;">가격은 판매처와 환율에 따라 크게 달라집니다.<br>같은 모델이라도 '보드만'인지 '키트'인지부터 비교하면 헷갈리지 않습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (06-함께-보면-좋은-글.png) ]]</p>
+<p style="font-size:16px;">아두이노·라즈베리파이·마이크로비트, 처음엔 무엇으로? (네이버 코딩가이드 · 아두이노·라즈베리파이 · 2026.11.23 작성 · 링크 자리)</p>
+<p style="font-size:16px;">마이크로비트 사기 전에 알 7가지, 몇 살부터·무엇을 살까? (네이버 코딩가이드 · 아두이노·라즈베리파이 · 2026.11.23 작성 · 링크 자리)</p>
+
+<p style="font-size:14px;color:#777;">모델과 사양은 2026년 11월 Raspberry Pi 공식 누리집 기준입니다.</p>
