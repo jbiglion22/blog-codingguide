@@ -1,0 +1,262 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: 파이썬 거북이 게임 만들기, 방향키로 먹이 잡기
+독자: 파이썬을 처음 배우는 초등학생(본문에는 '초등학생'이라고 쓰지 않음)과 함께 보는 부모님·선생님. 윈도우 PC, 파이썬 IDLE 기준. 거북이 그림 글을 본 사람이면 더 쉽게 따라옴(그 글을 몰라도 읽히게 씀).
+글 형식: 계산기·거북이 그림 글과 같은 강의형. 연재가 아닌 단독 글이라 '첫 수업', '1편', '첫째 시간'처럼 순서·연재로 읽히는 표현은 쓰지 않음. 안내 캐릭터 '파이'(자료실/공통-이미지/파이-캐릭터-시트.png)가 인사·💡 꿀팁·🎯 숙제·끝인사에 나옴. 🧩 쉽게 이해하기 2개, 맞혀 보기 1개.
+검색 설명: 파이썬 turtle로 방향키를 눌러 거북이를 움직이고 빨간 먹이를 잡으면 점수가 오르는 게임을 만든다. 할 일을 묶는 함수(def), 키와 함수를 잇는 onkey와 listen, 먹이에 닿았는지 재는 distance와 if, 먹이를 아무 데나 옮기는 random, 점수를 바꾸는 global까지 30줄 남짓으로.
+카테고리: 파이썬 코딩
+태그: #파이썬 #파이썬기초 #파이썬게임 #파이썬터틀 #turtle #거북이게임 #코딩기초 #파이썬예제 #코딩교육
+글자 수: 본문 공백 포함 3,999자 / 공백 제외 3,194자 (빨간 글씨 이미지 표시·줄바꿈 제외, 코드 포함, 2026.11.24)
+본문 글자 크기: 16px. 소제목 h2 24px, h3 18px + 기호 ▸(이 글 안에서는 모두 같은 기호).
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 링크 자리 두 줄은 거북이 그림 글·실무 파이썬 초급 0강(설치) 주소로 바꾼다.
+
+[이미지 순서와 각 그림이 이해시키는 것]
+01-타이틀.png (ChatGPT, 1:1 1080×1080, 파이·거북이) — '거북이 먹이 잡기 / 게임 만들기'. 글자 정확, 윗줄 가로 약 87%라 94%로 줄여 흐린 원본 위에 섞음(약 81%). 글자는 위쪽·캐릭터는 아래쪽 배치라 위아래 중심은 그대로
+02-키보드로-움직이는-거북이.png (ChatGPT, 3:2 1536×1024 → 1620×1080, 파이·거북이, 글자 정확, 노트북 로고·창 버튼 없음) — 방향키를 누르면 화면 속 거북이가 움직인다는 연결(키 = 명령)
+03-게임-규칙.png (AI, 가로 1440×900) — 실제 시작 화면 + 방향키 세 개가 하는 일 + 닿으면 점수
+04-키와-함수-연결.png (AI, 가로 1440×900) — 키 → 함수(go·turn_left·turn_right) → 하는 일
+05-닿았는지-재는-법.png (AI, 1080×1120) — 거리 60(아직) vs 거리 12(잡음), 기준 20을 원으로
+06-실행-결과.png (AI 틀 + 실제 실행 캡처, 1080×2258) — 시작 화면, 위 화살표 5번 뒤 먹이가 옮겨 간 화면, Shell의 '점수: 1'
+07-함께-보면-좋은-글.png (AI 배너, 이 글 디자인)
+디자인: 게임 화면 느낌(짙은 남색 바탕·옅은 가로 줄무늬·초록·노랑·빨강 점 세 개, 흰 글씨, 노랑 강조), 계산기(칠판)·거북이 그림(모눈종이) 글과 다르게. 스크립트 scratchpad/game/img.py.
+캡처 방법: 본문 코드(game.py)를 그대로 실행하되 선명하게 찍으려고 창을 두 배로 열고 같은 좌표를 2배 확대, 거북이·먹이 크기도 2배(scratchpad/game/harness2.py). 키 입력은 거북이 창에 실제 키 이벤트를 보내 확인. 두 번째 화면의 먹이 자리는 random이라 실행할 때마다 다름.
+
+[근거 — 실행 확인] 2026년 11월 24일, 윈도우 11·Python 3.14.5
+- 본문 전체 코드(game.py)를 그대로 실행하고, 거북이 창에 실제 키 이벤트(위 화살표)를 보내 확인: 시작 위치 (0, 0), 먹이 (100, 0). 위 화살표 5번째에 거북이가 (100, 0)에 닿아 Shell에 '점수: 1'이 찍히고 먹이가 다른 자리로 옮겨 감. 왼쪽 화살표 3번 → 방향 90도(위쪽).
+- global score를 빼면 먹이에 닿는 순간 UnboundLocalError: cannot access local variable 'score' where it is not associated with a value. 거북이는 움직이지만 점수가 안 오름.
+- screen.onkey(go(), "Up")처럼 괄호를 붙이면 실행하자마자 거북이가 한 번(20) 움직이고, 그 뒤로는 위 화살표를 눌러도 움직이지 않음(오류 메시지 없음).
+- turtle 공식 문서: onkey(fun, key)는 키를 놓을 때(key-release) fun을 부름(본문도 '눌렀다 놓으면'으로 씀, 2026-11-24 검수 반영), listen()은 거북이 창이 키 입력을 받도록 초점을 맞춤, distance()는 두 거북이 사이 거리, penup()은 선을 그리지 않고 움직임. random.randint(a, b)는 a 이상 b 이하 정수.
+- 키 입력은 거북이 창이 선택돼 있을 때만 받음(창 밖을 누르면 키가 그쪽으로 감) — 일반적인 창 동작.
+- 2026-11-24 외부 검수 반영: onkey 코드 블록 앞에 '함수를 먼저 만든 뒤 넣어야 하고 순서는 전체 코드에서 확인'(따로 실행하면 go가 없어 NameError), 방향키 규칙·실행 안내·괄호 실수를 '눌렀다 놓으면'으로, distance는 '중심 사이 거리'로 판정하고 테두리가 맞닿았는지 보는 게 아님. 그림 05 부제도 '중심 사이 거리'로.
+-->
+
+<p style="font-size:16px;">방향키를 누르면 거북이가 움직여요. 빨간 먹이를 잡으면 점수가 1점 올라가고, 먹이는 다른 곳으로 휙 옮겨 가요.</p>
+
+<p style="font-size:16px;">오늘은 이 게임을 직접 만들어 봅니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">파이썬에 들어 있는 그림 도구 <b>turtle</b>로 만들어요. 코드는 30줄 남짓이에요. 오늘도 안경 쓴 작은 뱀 <b>파이</b>가 함께합니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 키보드로 움직이는 거북이 (02-키보드로-움직이는-거북이.png) ]]</p>
+
+<p style="font-size:16px;"><b>🐍 파이:</b> 게임도 결국 "이 키를 누르면 이걸 해"라는 약속을 모아 둔 거예요. 하나씩 약속을 만들어 봐요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">오늘 만들 게임</h2>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 게임 규칙 (03-게임-규칙.png) ]]</p>
+
+<ul style="font-size:16px;">
+<li><b>↑ 위 화살표</b>를 눌렀다 놓으면 — 보고 있는 쪽으로 20만큼 앞으로</li>
+<li><b>← 왼쪽 화살표</b>를 눌렀다 놓으면 — 왼쪽으로 30도 돌기</li>
+<li><b>→ 오른쪽 화살표</b>를 눌렀다 놓으면 — 오른쪽으로 30도 돌기</li>
+<li>먹이에 닿으면 점수 +1, 먹이는 아무 데로나 이동</li>
+</ul>
+
+<p style="font-size:16px;">새로 배우는 건 네 가지예요. <b>함수</b>, <b>onkey</b>, <b>distance와 if</b>, <b>random</b>.</p>
+
+<p style="font-size:16px;">파이썬이 아직 없다면 맨 아래 링크한 설치 글을 먼저 보고 오세요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">등장인물 만들기: 거북이와 먹이</h2>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>import turtle
+import random
+
+t = turtle.Turtle()
+t.shape("turtle")
+t.color("green")
+t.penup()
+
+food = turtle.Turtle()
+food.shape("circle")
+food.color("red")
+food.penup()
+food.goto(100, 0)
+
+score = 0</code></pre>
+
+<p style="font-size:16px;">거북이를 두 마리 만들었어요. 하나는 우리가 움직일 초록 거북이 <b>t</b>, 하나는 동그란 빨간 먹이 <b>food</b>예요. turtle에서는 먹이도 거북이 한 마리로 만들고 모양만 동그라미로 바꿔요.</p>
+
+<p style="font-size:16px;"><b>penup()</b>은 펜을 들라는 뜻이에요. 게임에서는 지나간 자리에 선이 남지 않게 해요.</p>
+
+<p style="font-size:16px;"><b>goto(100, 0)</b>은 먹이를 오른쪽으로 100만큼 떨어진 곳에 놓아요. 거북이는 처음에 오른쪽을 보고 있으니, 위 화살표만 몇 번 누르면 첫 먹이를 잡을 수 있어요. 맨 아래 <b>score = 0</b>은 점수를 담을 상자예요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">키를 누르면 할 일, 함수로 묶기</h2>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>def turn_left():
+    t.left(30)
+
+def turn_right():
+    t.right(30)</code></pre>
+
+<p style="font-size:16px;"><b>def</b>는 "이런 이름으로 할 일을 묶어 둘게"라는 뜻이에요. 들여쓰기 한 줄들이 그 묶음에 들어가요. 적어 두기만 하고, 부를 때 실행돼요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 리모컨 버튼</b></p>
+
+<p style="font-size:16px;">리모컨 버튼 하나에는 "채널 올리기"처럼 할 일이 정해져 있죠. 버튼을 누르기 전에는 아무 일도 안 일어나요. 함수도 똑같아요. turn_left라는 버튼을 만들어 두고, 다음 단계에서 그 버튼을 키보드 키에 붙일 거예요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 키와 함수 연결 (04-키와-함수-연결.png) ]]</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▸ 키에 함수 붙이기: onkey와 listen</h3>
+
+<p style="font-size:16px;">아래 코드는 키와 함수를 연결하는 부분이에요. 실제로 실행할 때는 go, turn_left, turn_right 함수를 먼저 만들어 둔 다음 이 코드를 넣어야 해요. 마지막 전체 코드에서 순서를 다시 확인해 볼게요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>screen = turtle.Screen()
+screen.onkey(go, "Up")
+screen.onkey(turn_left, "Left")
+screen.onkey(turn_right, "Right")
+screen.listen()</code></pre>
+
+<p style="font-size:16px;"><b>onkey(go, "Up")</b>는 "위 화살표를 눌렀다 놓으면 go를 불러 줘"라는 약속이에요. 키를 누르는 순간이 아니라, 눌렀던 키를 놓을 때 함수가 실행돼요. <b>listen()</b>은 거북이 창이 키보드에 귀를 기울이게 해요. 이 줄이 없으면 키를 눌러도 반응하지 않아요.</p>
+
+<p style="font-size:16px;"><b>💡 파이의 꿀팁:</b> onkey에는 함수 이름만 써요. go 뒤에 괄호를 붙이지 않는 게 핵심이에요. 왜 그런지는 아래 '일부러 틀려 보기'에서 볼게요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">먹이를 잡았을까?</h2>
+
+<p style="font-size:16px;">이제 게임의 핵심인 <b>go</b> 함수예요. 앞으로 가고, 먹이에 닿았는지 확인해요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>def go():
+    global score
+    t.forward(20)
+    if t.distance(food) < 20:
+        score = score + 1
+        print("점수:", score)
+        x = random.randint(-200, 200)
+        y = random.randint(-200, 200)
+        food.goto(x, y)</code></pre>
+
+<p style="font-size:16px;"><b>t.distance(food)</b>는 초록 거북이와 빨간 먹이의 <b>중심 사이</b>가 얼마나 떨어져 있는지 재요. 그 거리가 20보다 작으면 잡은 것으로 판정하도록 규칙을 정했어요.</p>
+
+<p style="font-size:16px;"><b>if</b> 아래 들여쓰기 한 줄들은 조건이 맞을 때만 실행돼요. 점수를 1 올리고, 화면에 알려 주고, 먹이를 옮겨요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 닿았는지 재는 법 (05-닿았는지-재는-법.png) ]]</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 술래잡기</b></p>
+
+<p style="font-size:16px;">술래잡기에서 술래 손이 닿을 만큼 가까워지면 잡힌 거죠. 컴퓨터는 '닿았다'를 눈으로 못 보니까, 거북이와 먹이의 중심 사이 거리를 재서 "20보다 가까우면 잡힌 걸로 하자"라고 규칙을 정해 주는 거예요. 화면에서 두 모양의 테두리가 맞닿았는지를 보는 건 아니에요.</p>
+
+<p style="font-size:16px;"><b>random.randint(-200, 200)</b>은 -200부터 200 사이에서 정수 하나를 아무거나 뽑아요. 그래서 먹이가 매번 다른 곳으로 가요.</p>
+
+<p style="font-size:16px;">하나 맞혀 볼까요? 거리 기준 20을 <b>5</b>로 바꾸면 게임은 쉬워질까요, 어려워질까요?</p>
+
+<p style="font-size:16px;">정답은 <b>어려워진다</b>예요. 거의 정확히 겹쳐야만 잡히거든요. 숫자 하나로 게임 난이도가 바뀌어요.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▸ global score는 왜 있을까?</h3>
+
+<p style="font-size:16px;">score 상자는 함수 바깥에 있어요. 함수 안에서 그 값을 바꾸려면 "바깥에 있는 그 score를 쓸게요"라고 먼저 말해 줘야 해요. 그게 <b>global score</b>예요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">모아서 실행해 볼까요?</h2>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>import turtle
+import random
+
+t = turtle.Turtle()
+t.shape("turtle")
+t.color("green")
+t.penup()
+
+food = turtle.Turtle()
+food.shape("circle")
+food.color("red")
+food.penup()
+food.goto(100, 0)
+
+score = 0
+
+def go():
+    global score
+    t.forward(20)
+    if t.distance(food) < 20:
+        score = score + 1
+        print("점수:", score)
+        x = random.randint(-200, 200)
+        y = random.randint(-200, 200)
+        food.goto(x, y)
+
+def turn_left():
+    t.left(30)
+
+def turn_right():
+    t.right(30)
+
+screen = turtle.Screen()
+screen.onkey(go, "Up")
+screen.onkey(turn_left, "Left")
+screen.onkey(turn_right, "Right")
+screen.listen()
+
+turtle.done()</code></pre>
+
+<p style="font-size:16px;"><b>turtle_game.py</b>로 저장하고 <b>F5</b>를 누르세요. 거북이 창이 뜨면 <b>창을 한 번 클릭</b>한 뒤 위 화살표를 다섯 번 눌렀다 놓아 보세요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 실행 결과 (06-실행-결과.png) ]]</p>
+
+<p style="font-size:16px;">다섯 번째에 거북이가 먹이에 닿아요. IDLE의 Shell 창에 <b>점수: 1</b>이 찍히고, 먹이는 다른 자리로 옮겨 가요.</p>
+
+<p style="font-size:16px;"><b>💡 파이의 꿀팁:</b> 키를 눌러도 거북이가 꿈쩍 안 하면, 거북이 창이 선택돼 있는지 보세요. IDLE 창을 누른 상태라면 키 입력이 그쪽으로 가요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">일부러 틀려 보기</h2>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▸ onkey(go(), "Up")처럼 괄호를 붙이면?</h3>
+
+<p style="font-size:16px;">실행하자마자 거북이가 혼자 한 칸 움직여요. 그리고 그 뒤로는 위 화살표를 눌렀다 놓아도 꼼짝하지 않아요. 오류 메시지도 없어요.</p>
+
+<p style="font-size:16px;">원래 go는 위 화살표를 놓을 때 실행돼야 해요. 그런데 괄호를 붙이면 "지금 당장 go를 실행해"가 되어, 키를 누르기도 전에 프로그램이 시작하자마자 한 번 실행돼 버려요. 키에 붙여야 할 버튼을 미리 눌러 버린 셈이에요. 그래서 onkey에는 괄호 없이 이름만 써요.</p>
+
+<p>&nbsp;</p>
+<h3 style="font-size:18px;margin:24px 0 8px;">▸ global score를 빼먹으면?</h3>
+
+<p style="font-size:16px;">거북이는 잘 움직이는데, 먹이에 닿는 순간 Shell에 빨간 글씨가 나와요.</p>
+
+<pre style="background:#1e2330; color:#ff8a8a; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>UnboundLocalError: cannot access
+local variable 'score' where it is
+not associated with a value</code></pre>
+
+<p style="font-size:16px;">"함수 안에 score라는 상자가 있는 줄 알았는데, 아직 아무것도 안 들어 있어요"라는 뜻이에요. 바깥의 score를 쓴다고 말해 주지 않아서 생긴 일이에요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">오늘의 숙제: 내 게임으로 바꾸기</h2>
+
+<p style="font-size:16px;"><b>🎯 파이의 숙제</b></p>
+
+<ul style="font-size:16px;">
+<li>forward(20)을 forward(30)으로 바꿔 거북이를 빠르게 만들기</li>
+<li>left(30)·right(30)을 90으로 바꿔 보고, 어느 쪽이 조종하기 쉬운지 비교하기</li>
+<li>먹이 모양 "circle"을 "square"로, 색을 "blue"로 바꾸기</li>
+<li>도전: 아래 화살표("Down")를 누르면 뒤로 가는 함수를 만들어 붙이기 (힌트: t.backward(20))</li>
+</ul>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">누르고, 확인하고, 반응하고</h2>
+
+<p style="font-size:16px;">오늘 만든 게임은 세 가지를 되풀이해요. 키가 눌리면(입력), 먹이에 닿았는지 확인하고(조건), 점수를 올리고 먹이를 옮겨요(반응).</p>
+
+<p style="font-size:16px;">훨씬 화려한 게임도 이 세 가지를 아주 빠르게, 아주 많이 되풀이하며 움직여요.</p>
+
+<p style="font-size:16px;"><b>🐍 파이:</b> 도전 문제까지 해냈다면, 키를 하나 더 붙이는 법을 혼자 익힌 거예요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (07-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">파이썬 거북이로 그림 그리기, 별과 꽃을 코드로 (네이버 코딩가이드 · 파이썬 코딩 · 2026.11.24 작성 · 링크 자리)</p>
+
+<p style="font-size:16px;">[실무 파이썬 초급 0강] 파이썬 설치하고 첫 글자 띄우기 (네이버 코딩가이드 · 파이썬 코딩 · 2026.11.19 작성 · 링크 자리)</p>
