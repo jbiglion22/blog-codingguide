@@ -36,8 +36,18 @@ def font(size, bold=True):
     return f
 
 
+ART_OVERRIDE = {}   # 영상 합성용: {파일이름: 이미지}를 넣으면 그 그림을 배경으로 쓴다
+
+
+def add_note(im):
+    """일러스트 장면에 '설명용 그림' 안내를 작게 넣는다."""
+    line(ImageDraw.Draw(im), 1552, [("※ 그림은 설명용 일러스트예요", GRAY)], 30, bold=False, stroke=5)
+
+
 def background(name):
     """배경 그림을 1080x1920으로 맞춰 돌려준다. 없으면 임시 배경과 False."""
+    if name in ART_OVERRIDE:
+        return ART_OVERRIDE[name].copy(), True
     p = ART / name
     if p.exists():
         im = Image.open(p).convert("RGB")
@@ -197,8 +207,7 @@ if __name__ == "__main__":
     # 일러스트 장면에는 '설명용 그림' 안내를 작게 넣는다(5번 장면은 실제 실행 화면이라 제외).
     for i, (im, ok) in enumerate(made):
         if i != 1:
-            ImageDraw.Draw(im)
-            line(ImageDraw.Draw(im), 1552, [("※ 그림은 설명용 일러스트예요", GRAY)], 30, bold=False, stroke=5)
+            add_note(im)
     all_art = all(ok for _, ok in made)
     out = POST / "clip" if all_art else POST / "clip/미리보기"
     out.mkdir(parents=True, exist_ok=True)
@@ -208,5 +217,6 @@ if __name__ == "__main__":
         print(("[배경 있음] " if ok else "[임시 배경] ") + str(p))
     if not all_art:
         print("배경 그림이 아직 없는 장면이 있어 미리보기 폴더에 저장했습니다.")
+
 
 
