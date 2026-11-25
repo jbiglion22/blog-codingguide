@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """네이버 클립용 장면 이미지(1080x1920) 6장 — 「파이썬 거북이 게임 만들기, 방향키로 먹이 잡기」 글.
 
 방식: ChatGPT가 만든 글자 없는 배경 그림(clip/배경/01~06.png, 요청서 이미지요청-클립.md)에
@@ -42,6 +42,22 @@ ART_OVERRIDE = {}   # 영상 합성용: {파일이름: 이미지}를 넣으면 �
 def add_note(im):
     """일러스트 장면에 '설명용 그림' 안내를 작게 넣는다."""
     line(ImageDraw.Draw(im), 1552, [("※ 그림은 설명용 일러스트예요", GRAY)], 30, bold=False, stroke=5)
+
+
+BADGE_TEXT = "파이썬으로 게임 만들기"
+
+
+def badge(img):
+    """모든 장면 맨 위(안전 영역 시작)에 같은 꼬리표를 붙인다: 무엇에 대한 클립인지 바로 알게."""
+    d = ImageDraw.Draw(img)
+    f = font(40)
+    w = tw(d, BADGE_TEXT, f)
+    x0, y0 = (W - w) / 2 - 36, 236
+    x1, y1 = (W + w) / 2 + 36, 300
+    img = card(img, [x0, y0, x1, y1], fill=YEL, radius=32)
+    d = ImageDraw.Draw(img)
+    d.text(((W - w) / 2, y0 + 6), BADGE_TEXT, font=f, fill=NAVY)
+    return img
 
 
 def background(name):
@@ -129,9 +145,10 @@ def key_icon(d, x, y, kind, s=96):
 def scene1():
     img, ok = background("01.png")
     img = shade(img)
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("방향키", YEL), ("로", INK)], [("먹이를 잡아라!", INK)]], y=320)
-    footnote(d, "파이썬으로 만든 거북이 게임", 1450)
+    caption(d, [[("방향키", YEL), ("로", INK)], [("먹이를 잡아라!", INK)]], y=340)
+    footnote(d, "코드로 직접 만든 거북이 게임", 1450)
     return img, ok
 
 
@@ -139,8 +156,9 @@ def scene2(cap_img=None):
     """cap_img: 실제로 실행한 게임 창 캡처(영상 프레임). 없으면 글의 실행 캡처 한 장을 쓴다."""
     img, ok = background("02.png")
     img = shade(img, top=(0, 700, 150))
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("실제로는", INK)], [("이렇게 돌아가요", YEL)]], y=320)
+    caption(d, [[("실제로는", INK)], [("이렇게 돌아가요", YEL)]], y=340)
     # 실제 실행 화면 캡처
     cap = cap_img if cap_img is not None else \
         Image.open(SRC / "06-실행-결과.png").convert("RGB").crop((80, 286, 1002, 1034))
@@ -159,8 +177,9 @@ def scene2(cap_img=None):
 def scene3():
     img, ok = background("03.png")
     img = shade(img, top=(0, 700, 150), bottom=(1300, 1920, 160))
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("조종은", INK)], [("키 세 개", YEL), ("면 끝!", INK)]], y=320)
+    caption(d, [[("조종은", INK)], [("키 세 개", YEL), ("면 끝!", INK)]], y=340)
     items = [("up", "앞으로"), ("left", "왼쪽 돌기"), ("right", "오른쪽 돌기")]
     xs = [60, 400, 740]
     for (kind, text), x in zip(items, xs):
@@ -172,16 +191,18 @@ def scene3():
 def scene4():
     img, ok = background("04.png")
     img = shade(img, top=(0, 720, 150))
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("잡으면 ", INK), ("+1점!", YEL)], [("먹이는 휙, 다른 곳으로", INK)]], y=320, size=96)
+    caption(d, [[("잡으면 ", INK), ("+1점!", YEL)], [("먹이는 휙, 다른 곳으로", INK)]], y=340, size=96)
     return img, ok
 
 
 def scene5():
     img, ok = background("05.png")
     img = shade(img, top=(0, 700, 150), bottom=(1380, 1920, 160))
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("숫자 하나", YEL), ("로", INK)], [("난이도가 달라져요", INK)]], y=320, size=96)
+    caption(d, [[("숫자 하나", YEL), ("로", INK)], [("난이도가 달라져요", INK)]], y=340, size=96)
     img = card(img, [90, 1440, 990, 1540], fill=NAVY, radius=50, outline=YEL)
     d = ImageDraw.Draw(img)
     line(d, 1458, [("잡는 거리 ", INK), ("20", YEL), (" → ", INK), ("5", RED), ("  더 어려워요", INK)], 44, stroke=0)
@@ -191,8 +212,9 @@ def scene5():
 def scene6():
     img, ok = background("06.png")
     img = shade(img, top=(0, 700, 150))
+    img = badge(img)
     d = ImageDraw.Draw(img)
-    caption(d, [[("직접 만들어", INK)], [("볼래요?", YEL)]], y=320)
+    caption(d, [[("직접 만들어", INK)], [("볼래요?", YEL)]], y=340)
     img = card(img, [120, 1300, 960, 1430], fill=YEL, radius=65)
     d = ImageDraw.Draw(img)
     line(d, 1328, [("만드는 법은 블로그에서", NAVY)], 52, stroke=0)
