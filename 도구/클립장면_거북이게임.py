@@ -140,7 +140,7 @@ def scene2():
     ImageDraw.Draw(m).rounded_rectangle([0, 0, cap.width - 1, cap.height - 1], radius=18, fill=255)
     img.paste(cap, (x, y), m)
     d = ImageDraw.Draw(img)
-    line(d, 1062, [("실제 실행 화면", INK)], 40, stroke=6)
+    line(d, 1050, [("실제 실행 화면", INK)], 40, stroke=6)
     return img, ok
 
 
