@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """「파이썬 거북이 게임」 글의 게임 코드를 실제로 실행해 화면을 캡처하고,
-클립 2번 장면을 움직이는 영상(mp4)으로 만든다.
+클립 5번 장면을 움직이는 영상(mp4)으로 만든다.
 
 - 글의 코드와 같은 게임이다. 영상용으로 달라진 점 두 가지:
   1) 점수를 창 왼쪽 위에 글자로 표시한다(글의 코드는 Shell에만 찍는다).
   2) 키를 누르는 일은 자동 조종(먹이 쪽으로 방향을 맞춰 위 화살표를 누름)이 대신한다.
   거북이 이동·돌기·거리 판정·먹이 이동은 글의 코드 그대로다.
 - 실행: python 도구/클립영상_거북이게임.py   (실행 중 화면에 거북이 창이 잠깐 뜬다. 가리지 말 것)
-- 결과: clip/02-내가-만든-게임.mp4 (약 7초, 1080x1920, 소리 없음)
+- 결과: clip/05-실제-실행.mp4 (약 7초, 1080x1920, 소리 없음)
 - 필요: Pillow, ffmpeg(C:/ffmpeg/bin/ffmpeg.exe)
 """
 import ctypes
@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import 클립장면_거북이게임 as scenes
 
 POST = scenes.POST
-OUT_MP4 = POST / "clip/02-내가-만든-게임.mp4"
+OUT_MP4 = POST / "clip/05-실제-실행.mp4"
 FFMPEG = "C:/ffmpeg/bin/ffmpeg.exe"
 SEED = 7
 FPS = 12
@@ -147,3 +147,4 @@ if __name__ == "__main__":
                         "-i", str(tmp / "out/c%03d.png"), "-c:v", "libx264", "-pix_fmt", "yuv420p",
                         "-crf", "20", str(OUT_MP4)], check=True)
         print("영상:", OUT_MP4, " 미리보기:", keep)
+

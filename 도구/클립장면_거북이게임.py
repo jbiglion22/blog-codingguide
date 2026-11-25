@@ -130,7 +130,7 @@ def scene2(cap_img=None):
     img, ok = background("02.png")
     img = shade(img, top=(0, 700, 150))
     d = ImageDraw.Draw(img)
-    caption(d, [[("내가 만든", INK)], [("거북이 게임", YEL)]], y=320)
+    caption(d, [[("실제로는", INK)], [("이렇게 돌아가요", YEL)]], y=320)
     # 실제 실행 화면 캡처
     cap = cap_img if cap_img is not None else \
         Image.open(SRC / "06-실행-결과.png").convert("RGB").crop((80, 286, 1002, 1034))
@@ -192,9 +192,9 @@ def scene6():
 
 if __name__ == "__main__":
     scenes = [scene1, scene2, scene3, scene4, scene5, scene6]
-    names = ["01-훅", "02-내가-만든-게임", "03-키-세-개", "04-먹이는-휙", "05-난이도", "06-마무리"]
+    names = ["01-훅", "05-실제-실행", "02-키-세-개", "03-먹이는-휙", "04-난이도", "06-마무리"]
     made = [fn() for fn in scenes]
-    # 일러스트 장면에는 '설명용 그림' 안내를 작게 넣는다(2번 장면은 실제 실행 화면이라 제외).
+    # 일러스트 장면에는 '설명용 그림' 안내를 작게 넣는다(5번 장면은 실제 실행 화면이라 제외).
     for i, (im, ok) in enumerate(made):
         if i != 1:
             ImageDraw.Draw(im)
@@ -208,4 +208,5 @@ if __name__ == "__main__":
         print(("[배경 있음] " if ok else "[임시 배경] ") + str(p))
     if not all_art:
         print("배경 그림이 아직 없는 장면이 있어 미리보기 폴더에 저장했습니다.")
+
 
