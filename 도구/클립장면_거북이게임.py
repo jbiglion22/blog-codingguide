@@ -47,16 +47,17 @@ def add_note(im):
 BADGE_TEXT = "파이썬으로 게임 만들기"
 
 
-def badge(img):
+def badge(img, text=None):
     """모든 장면 맨 위(안전 영역 시작)에 같은 꼬리표를 붙인다: 무엇에 대한 클립인지 바로 알게."""
     d = ImageDraw.Draw(img)
     f = font(40)
-    w = tw(d, BADGE_TEXT, f)
+    text = text or BADGE_TEXT
+    w = tw(d, text, f)
     x0, y0 = (W - w) / 2 - 36, 236
     x1, y1 = (W + w) / 2 + 36, 300
     img = card(img, [x0, y0, x1, y1], fill=YEL, radius=32)
     d = ImageDraw.Draw(img)
-    d.text(((W - w) / 2, y0 + 6), BADGE_TEXT, font=f, fill=NAVY)
+    d.text(((W - w) / 2, y0 + 6), text, font=f, fill=NAVY)
     return img
 
 

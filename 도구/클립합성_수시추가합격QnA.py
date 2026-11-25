@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """「수시 추가 합격 Q&A」 클립 합성 — 폰 캐릭터 하나가 모든 장면에서 살짝 움직이는 영상(더빙 없음).
 
 - 배경: clip/배경/01~06.png (ChatGPT, 글자 없음) / 폰: clip/레이어/폰.png (투명 PNG) / 음악: clip/원본/음악.wav
@@ -32,6 +32,7 @@ YEL = (255, 205, 50)
 INK = (255, 255, 255)
 GRAY = (205, 208, 235)
 
+BADGE = "수시 추가 합격 Q&A"
 PHONE = Image.open(CLIP / "레이어/폰.png").convert("RGBA")
 
 
@@ -58,7 +59,7 @@ def wrap(text, size, maxw):
     return best[1]
 
 
-def q_cards(img, items, y=320, size=50):
+def q_cards(img, items, y=340, size=50):
     """질문 카드(Q번호 배지 + 질문)를 위에서부터 쌓는다."""
     f = S.font(size)
     for num, text, color in items:
@@ -92,11 +93,12 @@ SCENES = [
 def static_scene(sc):
     art = Image.open(CLIP / "배경" / sc["art"]).convert("RGB")
     img = S.shade(art, top=(0, 780, 165), bottom=(1380, 1920, 150) if sc["key"] == 6 else None)
+    img = S.badge(img, BADGE)          # 모든 장면 맨 위 주제 배지(2026-11-25)
     d = ImageDraw.Draw(img)
     k = sc["key"]
     if k == 1:
-        S.caption(d, [[("예비 ", INK), ("12번", YEL)], [("받았다면?", INK)]], y=320, size=104, gap=130)
-        S.line(d, 600, [("그날부터 질문이 꼬리를 물어요", GRAY)], 48, bold=False)
+        S.caption(d, [[("예비 ", INK), ("12번", YEL)], [("받았다면?", INK)]], y=340, size=104, gap=130)
+        S.line(d, 624, [("그날부터 질문이 꼬리를 물어요", GRAY)], 48, bold=False)
     elif k == 2:
         img, _ = q_cards(img, [("Q1", "추가 합격 발표는 언제부터?", TEAL), ("Q2", "꼭 전화로 올까?", CORAL)])
     elif k == 3:
@@ -106,7 +108,7 @@ def static_scene(sc):
     elif k == 5:
         img, _ = q_cards(img, [("Q7", "등록했다가 포기하면 돈은 돌려받나?", TEAL), ("Q8", "입학처를 사칭한 전화면?", CORAL)])
     elif k == 6:
-        S.caption(d, [[("8가지 질문,", INK)], [("답은 ", INK), ("블로그에서", YEL)]], y=320, size=96, gap=124)
+        S.caption(d, [[("8가지 질문,", INK)], [("답은 ", INK), ("블로그에서", YEL)]], y=340, size=96, gap=124)
         S.line(d, 700, [("12월 24일 전에 적어 둘 다섯 줄도 있어요", GRAY)], 40, bold=False)
         S.line(d, 1516, [("2027학년도 모집요강 기준", GRAY)], 34, bold=False, stroke=5)
     return img
