@@ -1,2 +1,5 @@
 # IntelliJ 개인 설정
 .idea/
+
+__pycache__/
+*.pyc
