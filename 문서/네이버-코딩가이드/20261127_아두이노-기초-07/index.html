@@ -1,0 +1,243 @@
+<meta charset="utf-8">
+<!--
+[네이버 블로그 발행 메모]
+제목: [아두이노 기초 #7] 시리얼 모니터로 아두이노와 대화하기
+독자: 초등학생~중학생과 지도하는 학부모·선생님. 독자는 자기 아두이노(실물)로 따라 한다. 안내 캐릭터 '두이'(인사·꿀팁·미션·예고).
+검색 설명: 아두이노 기초 연재 7편. 화면이 없는 아두이노가 컴퓨터 화면에 글자를 보내는 시리얼 모니터를 아주 쉽게 알아본다. 인사 한 줄 보내기, print와 println의 차이, 1초마다 숫자 세기까지 짧은 코드 세 개로 한 단계씩 따라 한다. 초·중학생 눈높이.
+카테고리: 아두이노·라즈베리파이
+태그: #아두이노 #아두이노기초 #시리얼모니터 #SerialPrint #println #아두이노코딩 #초등코딩 #중학생코딩
+글자 수: 본문 공백 포함 3,416자 / 공백 제외 2,649자 (코드 포함, 빨간 이미지 표시 제외)
+본문 글자 크기: 16px. 소제목 h2 24px·h3 18px(기호 ▶).
+연재: 네이버 아두이노 연재 기초 7편(목차·규칙은 저장소 루트 '네이버-코딩가이드-아두이노-연재.md'). 이전 편: 기초 6편 「누를 때마다 켜고 끄는 스위치 만들기」. 다음 편: 기초 8편 「가변저항으로 아날로그 값 읽기」.
+          이 편부터 적용한 사용자 지시(2026-11-27): ① 독자가 초·중학생이므로 아주 쉽게(새로 배우는 것은 '속도 맞추기(9600)'와 'print·println 차이' 두 가지, 짧은 코드 세 개로 한 단계씩) ② 맨 뒤에 '함께 보면 좋은 글'(이 글 스타일 배너 + 링크 줄).
+발행 방법: 이 파일을 브라우저로 연 다음 본문을 드래그해 복사 → 네이버 편집기에 붙여넣는다. 코드 블록은 네이버 편집기의 '소스코드' 기능으로 다시 넣는 것을 권장.
+          본문의 빨간 글씨 [[ 이미지: 제목 (파일명) ]] 자리에 해당 파일을 올리고, 빨간 글씨는 지운다.
+          맨 아래 '링크 자리' 줄 세 개는 각 글의 발행 주소로 바꾼다.
+
+[이미지 순서]
+01-타이틀.png (ChatGPT, 1:1, 두이 — 둘째 줄 가로 약 88%라 94%로 줄이고 가장자리는 끝 줄을 늘려 흐리게 채움 → 약 83%, 글자 덩어리 세로 중심 약 51%. 원본 scratchpad/backup/ard07-01-original.png)
+02-이번-편에서-만들-것.png (ChatGPT, 4:5, 두이 — 아두이노가 USB 케이블로 컴퓨터 화면에 글자를 보내는 장면. 화면 창 왼쪽 위 빨강·노랑·초록 점(특정 운영체제 창 버튼 모양)을 옆 제목줄로 덮음, 1122×1402 → 1080×1350. 원본 scratchpad/backup/ard07-02-original.png)
+03-시리얼-모니터-여는-법.png (AI, 4:5, IDE 화면을 공식 문서 설명대로 단순하게 그린 도식)
+04-첫째-결과.png (AI, 가로, 시리얼 모니터 결과 — 실제 실행 출력)
+05-print와-println.png (AI, 4:5, 같은 글자를 print·println으로 보냈을 때)
+06-셋째-결과.png (AI, 가로, 숫자 세기 결과 — 실제 실행 출력)
+07-안-될-때.png (AI, 4:5)
+08-두이의-미션.png (AI, 1:1)
+09-함께-보면-좋은-글.png (AI, 이 연재 스타일 배너)
+
+[외부 검수 반영] 2026-11-27 두 가지: ① 9600 설명을 '시리얼 통신 속도(baud)'로 바꿈 — 아두이노 공식 레퍼런스(Serial.begin)는 'data rate in bits per second (baud)'라고 적고 있고 UART에서는 baud와 초당 비트 수가 같아 앞 문장이 틀린 것은 아니지만, 쉬운 표현으로 정리 ② int 범위는 보드마다 다름 — 우노 R3(ATmega328P)는 16비트(32767), 우노 R4(32비트 Arm)는 32비트라 학부모·선생님 칸에 나눠 쓰고, 준비물에 '이 연재는 우노 R3 기준'을 밝힘. 그림은 해당 문구 없음.
+
+[근거 — 공식 문서 확인]
+- 아두이노 공식 레퍼런스 Serial.begin(): 시리얼 통신 속도(초당 비트, baud)를 정한다. 시리얼 모니터와 통신할 때는 모니터 쪽에서도 같은 속도를 골라야 한다.
+- Serial.print(): 데이터를 사람이 읽을 수 있는 글자로 보낸다. Serial.println(): 같지만 끝에 줄바꿈 문자를 붙인다.
+- 아두이노 IDE 2 「Using the Serial Monitor tool」: 오른쪽 위 시리얼 모니터 버튼을 누르면 아래쪽에 시리얼 모니터가 열리고, 오른쪽에서 속도를 고른다(2편과 같은 설명).
+- 일반 지식으로 쓴 것(발행 메모 표시): 속도가 다르면 알아볼 수 없는 글자가 나온다, 리셋 버튼을 누르면 프로그램이 처음부터 다시 시작해 setup()이 다시 실행된다, 우노는 USB 케이블로 컴퓨터와 글자를 주고받는다.
+- 코드 확인(2026.11.27): 이 글의 세 코드를 Wokwi 시뮬레이터(가상 우노)에서 그대로 실행 → ① '안녕! 나는 아두이노야.' 한 줄 ② '사과 바나나 포도' 다음 줄 '딸기' ③ '숫자: 1', '숫자: 2', '숫자: 3'… 1초마다 한 줄. 그림 04·05·06은 이 출력을 그대로 옮겼다. 실물 보드로는 확인하지 못함. 본문·그림에는 시뮬레이터 언급 없음(사용자 결정 2026-11-19).
+-->
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 안녕! 나는 화면이 없어서 말을 못 했어. 오늘은 컴퓨터 화면을 빌려서 처음으로 말해 볼 거야!</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 타이틀 (01-타이틀.png) ]]</p>
+
+<p style="font-size:16px;">'아두이노 기초' 연재 7편입니다.</p>
+
+<p style="font-size:16px;">아두이노에는 화면이 없어요. 그래서 무슨 생각을 하는지 알기 어렵죠.</p>
+
+<p style="font-size:16px;">오늘은 아두이노가 컴퓨터 화면에 글자를 보내게 해 볼 거예요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">이번 편에서 만들 것</h2>
+
+<p style="font-size:16px;">오늘은 세 가지를 차례로 해 봐요.</p>
+
+<p style="font-size:16px;">• 아두이노가 인사 한 줄 보내기</p>
+<p style="font-size:16px;">• 글자를 한 줄로, 또는 줄을 바꿔 보내기</p>
+<p style="font-size:16px;">• 1초마다 숫자 세기</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 이번 편에서 만들 것 (02-이번-편에서-만들-것.png) ]]</p>
+
+<p style="font-size:16px;"><b>준비물</b>: 아두이노 우노(이 연재는 우노 R3 기준), USB 케이블, 컴퓨터</p>
+
+<p style="font-size:16px;">이번에는 브레드보드도, 선도 필요 없어요. USB 케이블만 꽂으면 돼요.</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">시리얼 모니터는 무엇일까?</h2>
+
+<p style="font-size:16px;">아두이노가 보낸 글자를 컴퓨터에서 보여 주는 창이에요.</p>
+
+<p style="font-size:16px;">이 창의 이름이 <b>시리얼 모니터</b>예요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 아두이노의 문자 메시지</b></p>
+
+<p style="font-size:16px;">• 아두이노는 휴대폰이 없는 친구예요.</p>
+<p style="font-size:16px;">• 대신 USB 케이블로 컴퓨터에 문자를 보내요.</p>
+<p style="font-size:16px;">• 우리는 컴퓨터 화면에서 그 문자를 읽어요.</p>
+<p style="font-size:16px;">• 한 줄 정리: 시리얼 모니터는 <b>아두이노의 문자 메시지 창</b>이에요!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">첫째, 인사 한 줄 보내기</h2>
+
+<p style="font-size:16px;">아래 코드를 IDE에 그대로 써 보세요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>void setup() {
+  Serial.begin(9600);
+  Serial.println("안녕! 나는 아두이노야.");
+}
+
+void loop() {
+}</code></pre>
+
+<p style="font-size:16px;">한 줄씩 볼까요?</p>
+
+<p style="font-size:16px;">• <code>Serial.begin(9600);</code> — 컴퓨터와 이야기할 준비를 해요.</p>
+<p style="font-size:16px;">• <code>Serial.println("…");</code> — 따옴표 안의 글자를 컴퓨터로 보내요.</p>
+<p style="font-size:16px;">• <code>loop()</code> 안은 비어 있어요. 인사는 한 번만 하면 되거든요.</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▶ 9600은 무슨 숫자일까?</h3>
+
+<p style="font-size:16px;">글자를 주고받는 <b>빠르기</b>예요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 말하는 빠르기 맞추기</b></p>
+
+<p style="font-size:16px;">• 친구가 아주 빠르게 말하는데, 나는 천천히 듣는다고 해 봐요.</p>
+<p style="font-size:16px;">• 무슨 말인지 하나도 못 알아듣겠죠?</p>
+<p style="font-size:16px;">• 아두이노와 컴퓨터도 같은 빠르기로 맞춰야 해요.</p>
+<p style="font-size:16px;">• 한 줄 정리: 코드에 9600이라고 썼으면, 시리얼 모니터도 <b>9600</b>으로 맞춰요!</p>
+
+<h3 style="font-size:18px;margin:24px 0 8px;">▶ 시리얼 모니터 열기</h3>
+
+<p style="font-size:16px;">먼저 업로드 버튼(오른쪽 화살표)을 눌러 코드를 올려요.</p>
+
+<p style="font-size:16px;">그다음 IDE <b>오른쪽 위의 시리얼 모니터 버튼</b>을 눌러요. 화면 아래쪽에 창이 열려요.</p>
+
+<p style="font-size:16px;">창 오른쪽에서 빠르기를 <b>9600</b>으로 골라요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 시리얼 모니터 여는 법 (03-시리얼-모니터-여는-법.png) ]]</p>
+
+<p style="font-size:16px;">이렇게 나와요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 첫째 결과 (04-첫째-결과.png) ]]</p>
+
+<p style="font-size:16px;">※ 바르게 업로드했다면 이렇게 보여요.</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 인사를 못 봤다면 보드의 <b>리셋 버튼</b>을 눌러 봐. 내가 처음부터 다시 시작해서 인사를 또 해!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">둘째, 한 줄로? 줄을 바꿔서?</h2>
+
+<p style="font-size:16px;">글자를 보내는 말은 두 가지가 있어요.</p>
+
+<p style="font-size:16px;">• <code>Serial.print</code> — 글자만 보내요.</p>
+<p style="font-size:16px;">• <code>Serial.println</code> — 글자를 보내고 <b>줄을 바꿔요</b>.</p>
+
+<p style="font-size:16px;">끝에 붙은 <code>ln</code>은 '줄(line)'이라는 뜻이에요.</p>
+
+<p style="font-size:16px;">직접 비교해 봐요. 첫째 코드를 지우고 이 코드를 올려요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>void setup() {
+  Serial.begin(9600);
+  Serial.print("사과 ");
+  Serial.print("바나나 ");
+  Serial.println("포도");
+  Serial.println("딸기");
+}
+
+void loop() {
+}</code></pre>
+
+<p style="font-size:16px;">이렇게 나와요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: print와 println (05-print와-println.png) ]]</p>
+
+<p style="font-size:16px;">사과·바나나·포도는 한 줄에 붙어 나왔어요. '포도'를 보낸 <code>println</code>이 줄을 바꿔서, 딸기는 다음 줄에 나왔어요.</p>
+
+<p style="font-size:16px;"><b>🧩 쉽게 이해하기 — 엔터 키</b></p>
+
+<p style="font-size:16px;">• 공책에 글을 쓸 때 엔터를 누르면 다음 줄로 가죠?</p>
+<p style="font-size:16px;">• <code>print</code>는 엔터 없이 이어 쓰기예요.</p>
+<p style="font-size:16px;">• <code>println</code>은 다 쓰고 엔터를 누르는 거예요.</p>
+<p style="font-size:16px;">• 한 줄 정리: 줄을 바꾸고 싶으면 <b>println</b>!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">셋째, 1초마다 숫자 세기</h2>
+
+<p style="font-size:16px;">이번에는 아두이노가 숫자를 세게 해 봐요.</p>
+
+<pre style="background:#1e2330; color:#e6e9f0; padding:16px; border-radius:8px; overflow-x:auto; line-height:1.6; font-size:14px; font-family:Consolas,'D2Coding',monospace;"><code>int count = 0;   // 숫자를 넣어 둘 기억 상자
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  count = count + 1;          // 상자 속 숫자에 1 더하기
+  Serial.print("숫자: ");
+  Serial.println(count);      // 상자 속 숫자 보여 주기
+  delay(1000);                // 1초 쉬기
+}</code></pre>
+
+<p style="font-size:16px;">한 줄씩 볼까요?</p>
+
+<p style="font-size:16px;">• <code>count</code>는 6편에서 배운 <b>기억 상자</b>예요. 처음엔 0이 들어 있어요.</p>
+<p style="font-size:16px;">• <code>loop()</code>가 한 번 돌 때마다 1씩 커져요.</p>
+<p style="font-size:16px;">• <code>print</code>로 '숫자: '를 쓰고, <code>println</code>으로 숫자를 쓴 뒤 줄을 바꿔요.</p>
+<p style="font-size:16px;">• <code>delay(1000)</code>으로 1초 쉬어요.</p>
+
+<p style="font-size:16px;">숫자에는 따옴표를 붙이지 않았어요. 따옴표가 없으면 상자 속 숫자를 보여 줘요.</p>
+
+<p style="font-size:16px;">이렇게 나와요.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 셋째 결과 (06-셋째-결과.png) ]]</p>
+
+<p style="font-size:16px;">1초마다 한 줄씩 늘어나요. 아두이노가 지금 몇까지 셌는지 화면으로 볼 수 있죠.</p>
+
+<p style="font-size:16px;"><b>💡 두이의 꿀팁:</b> 코드가 생각대로 안 될 때도 시리얼 모니터에 숫자를 찍어 봐. 내 속마음이 보여서 틀린 곳을 찾기 쉬워!</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">안 될 때 확인할 것</h2>
+
+<p style="font-size:16px;">막히면 하나씩 살펴봐요.</p>
+
+<p style="font-size:16px;">• <b>이상한 글자가 나와요</b> → 창의 빠르기가 9600인지 보세요.</p>
+<p style="font-size:16px;">• <b>아무것도 안 나와요</b> → 코드에 <code>Serial.begin(9600);</code>이 있는지 보세요. 업로드가 끝났는지도요.</p>
+<p style="font-size:16px;">• <b>모든 글자가 한 줄에 붙어요</b> → <code>print</code>를 <code>println</code>으로 바꿔 보세요.</p>
+<p style="font-size:16px;">• <b>한글만 깨져요</b> → 따옴표 안을 영어로 바꿔 보세요. 예: "Hello"</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 안 될 때 확인할 것 (07-안-될-때.png) ]]</p>
+
+<p>&nbsp;</p>
+<hr style="border:none;border-top:1px solid #cfcfcf;margin:8px 0;">
+<h2 style="font-size:24px;margin:40px 0 12px;">다음 편: 가변저항으로 아날로그 값 읽기</h2>
+
+<p style="font-size:16px;"><b>🎯 두이의 미션</b></p>
+
+<p style="font-size:16px;">• <b>내 이름으로 인사</b>: 첫째 코드의 인사를 내 이름이 들어가게 바꿔 보기</p>
+<p style="font-size:16px;">• <b>빨리 세기</b>: 셋째 코드의 1000을 500으로 바꿔 보기</p>
+<p style="font-size:16px;">• <b>2씩 세기</b>: 2, 4, 6…처럼 세어 보기 (힌트: <code>+ 1</code>을 바꿔 봐요)</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 두이의 미션 (08-두이의-미션.png) ]]</p>
+
+<p style="font-size:16px;">다음 편에서는 손잡이를 돌리는 부품, <b>가변저항</b>을 써요. 돌리는 만큼 바뀌는 숫자를 오늘 배운 시리얼 모니터로 볼 거예요.</p>
+
+<p style="font-size:16px;"><b>🤖 두이:</b> 드디어 말을 했어! 다음엔 손잡이를 돌리면 내가 숫자로 알려 줄게!</p>
+
+<p style="font-size:16px;"><b>👩‍🏫 학부모·선생님께</b></p>
+
+<p style="font-size:16px;">• 이 편은 부품 없이 보드와 USB 케이블만 씁니다. 다음 편부터 시리얼 모니터로 센서 값을 계속 확인하니, 창 여는 법과 9600 맞추기를 익혀 두면 좋습니다.</p>
+<p style="font-size:16px;">• 본문은 쉽게 줄여 썼습니다. 정확히는 이렇습니다.</p>
+<p style="font-size:16px;">• 9600은 시리얼 통신 속도(baud)입니다. 코드와 시리얼 모니터의 값이 같으면 다른 값(예: 115200)을 써도 됩니다.</p>
+<p style="font-size:16px;">• 시리얼 모니터에서 아두이노로 글자를 보내는 방법(<code>Serial.read</code> 등)도 있습니다. 이 편에서는 아두이노가 보내는 쪽만 다뤘습니다.</p>
+<p style="font-size:16px;">• <code>int</code>가 담을 수 있는 숫자의 크기는 보드마다 다릅니다. 우노 R3에서는 <code>int</code>가 32767까지라서, 아주 오래 켜 두면 그다음에 음수로 넘어갑니다(1초에 한 번 세면 9시간 넘게 걸려 수업 중에는 문제가 되지 않습니다). 우노 R4는 <code>int</code>가 훨씬 큰 수까지 담습니다.</p>
+<p style="font-size:16px;">• 한글이 잘 보이는지는 컴퓨터 환경에 따라 다를 수 있습니다.</p>
+
+<p style="font-size:16px;color:#e60000;font-weight:bold;">[[ 이미지: 함께 보면 좋은 글 (09-함께-보면-좋은-글.png) ]]</p>
+
+<p style="font-size:16px;">[아두이노 기초 #6] 누를 때마다 켜고 끄는 스위치 만들기 (네이버 코딩가이드 · 아두이노·라즈베리파이 · 2026.11.20 작성 · 링크 자리)</p>
+<p style="font-size:16px;">[아두이노 기초 #2] 프로그램 설치하고 첫 LED 깜빡이기 (네이버 코딩가이드 · 아두이노·라즈베리파이 · 2026.11.19 작성 · 링크 자리)</p>
+<p style="font-size:16px;">아두이노 키트 고르는 법, 처음엔 무엇을 살까? (네이버 코딩가이드 · 아두이노·라즈베리파이 · 2026.11.23 작성 · 링크 자리)</p>
