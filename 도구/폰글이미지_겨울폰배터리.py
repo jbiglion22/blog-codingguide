@@ -120,7 +120,7 @@ def temp_band():
     W, H = 1080, 900
     im = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(im)
     kicker(d, 60, 48)
-    ctext(d, W / 2, 120, "아이폰 안내로 본 '편한 온도'", F(56), INK)
+    ctext(d, W / 2, 120, "스마트폰이 편한 온도", F(56), INK)
     x0, x1, t0, t1 = 90, 990, -25, 50
     X = lambda t: x0 + (x1 - x0) * (t - t0) / (t1 - t0)
     # 온도 축
