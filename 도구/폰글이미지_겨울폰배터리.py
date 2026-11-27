@@ -1,10 +1,11 @@
 import sys, math, random
-sys.path.insert(0, "/home/user/blog-codingguide/도구")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from 이미지꾸미기 import frame_card, frame_line
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 OUT = sys.argv[1]
-FD = "/tmp/claude-0/fonts/package/dist/public/static/"
+FD = os.environ.get("PRETENDARD_DIR", "/tmp/claude-0/fonts/package/dist/public/static/").rstrip("/\\") + "/"
 def F(size, w="Bold"):
     return ImageFont.truetype(FD + f"Pretendard-{w}.otf", size)
 
@@ -120,7 +121,7 @@ def temp_band():
     W, H = 1080, 900
     im = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(im)
     kicker(d, 60, 48)
-    ctext(d, W / 2, 120, "스마트폰이 편한 온도", F(56), INK)
+    ctext(d, W / 2, 120, "한 제조사가 안내한 온도", F(56), INK)
     x0, x1, t0, t1 = 90, 990, -25, 50
     X = lambda t: x0 + (x1 - x0) * (t - t0) / (t1 - t0)
     # 온도 축
@@ -134,20 +135,20 @@ def temp_band():
     d.text((x1 - 10, ay + 22), "℃", font=F(40), fill=INK)
     # 막대들
     rows = [(250, -20, 45, "#c6d0dc", "보관 -20~45℃", INK),
-            (370, 0, 35, ICE, "쓰기 좋은 0~35℃", "white"),
+            (370, 0, 35, ICE, "사용 0~35℃", "white"),
             (490, 16, 22, "#2e8b57", "", "white")]
     for y, a, b, col, lab, tc in rows:
         d.rounded_rectangle((X(a), y, X(b), y + 84), 20, fill=col)
         if lab:
             ctext(d, (X(a) + X(b)) / 2, y + 16, lab, F(42), tc)
-    d.text((X(22) + 20, 500), "가장 편한 구간", font=F(40), fill="#2e8b57")
+    d.text((X(22) + 20, 500), "이상적인 구간", font=F(40), fill="#2e8b57")
     # 한겨울 바깥
     mx = X(-10)
     d.polygon(((mx, ay - 6), (mx - 18, ay - 40), (mx + 18, ay - 40)), fill=ORG)
     d.rounded_rectangle((mx - 120, 720 + 40, mx + 140, 720 + 110), 18, fill=ORG)
     ctext(d, mx + 10, 778, "한겨울 바깥", F(40), "white")
     d.line((mx, ay + 70, mx, 760), fill=ORG, width=4)
-    ctext(d, 760, 790, "0℃ 아래는 '쓰기 좋은' 범위 밖", F(38, "SemiBold"), GRAY)
+    ctext(d, 760, 790, "기준은 제조사·기기마다 다를 수 있음", F(38, "SemiBold"), GRAY)
     im = frame_line(im, col="#9fb6cf", width=4)
     im.save(f"{OUT}/03-폰이-편한-온도.png")
 
@@ -168,5 +169,7 @@ def banner():
     d.polygon(((ax - 38, 118), (ax + 38, 118), (ax, 160)), fill="#ffb36b")
     im.save(f"{OUT}/04-함께-보면-좋은-글.png")
 
-title(); why_off(); temp_band(); banner()
+targets = sys.argv[2:] or ["title", "why_off", "temp_band", "banner"]
+for name in targets:
+    globals()[name]()
 print("ok")
