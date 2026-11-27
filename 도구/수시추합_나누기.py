@@ -114,3 +114,72 @@ with open(os.path.join(OUT, "학년도별_요약.md"), "w", encoding="utf-8") as
     f.write("| 유형 | " + " | ".join(f"{y}학년도" for y in years) + " |" + NL + "|---|" + "---|" * len(years) + NL)
     for t, _ in TAGS: f.write(f"| {t} | " + " | ".join(str(stats[y][t]) for y in years) + " |" + NL)
 print([(y, kept[y], dropped[y]) for y in years], len(schools))
+
+# ---- 경험담 · 질문과 답변 (세 번째 인자로 도구/수시추합_본문댓글수집.py의 pages.json을 주면 만든다) ----
+if len(sys.argv) > 3:
+    pages = json.load(open(sys.argv[3], encoding="utf-8"))
+    QTITLE = re.compile(r"\?|까요|나요|될까|되나|궁금|질문|인가요|있나|있을까|어떡|어떻게|ㄱㄴ|가능\??$")
+    EXPW = re.compile(r"후기|받았|받음|받았어|왔어|왔습니다|왔다|왔음|왔네|됐어|됐습니다|됐다|됐음|됐네|붙었|붙음|떴어|떴다|떴습니다|떴네|합격했|합격입니다|ㅇㅈ|작년에|재작년|경험|했었|받아봄|받아봤|썰|돌았|빠졌|빠지고|끊겼")
+    FIRST = re.compile(r"저는|제가|저도|저 |나도|내가|나는|본인|후기|ㅇㅈ|인증|친구|우리 ?애|아들|딸")
+    CHUHAP = re.compile(r"추합|추가합격|충원|예비|추추|막차|전화")
+    NOEXP = re.compile(r"칼럼|공부법|컨설팅|예측|분석|입결표|가이드|정리|이유|허와 실|빵꾸|vs|VS")
+    CHEER = re.compile(r"추합\s?기원|기원합니다|기원해|화이팅|파이팅|축하|ㅊㅋ|부럽|가즈아|기도|응원|고생하셨|수고하셨")
+    def meaningful(c):
+        t = c["text"].strip()
+        core = re.sub(r"[ㅋㅎㅠㅜ!?.~\s]", "", t)
+        if len(core) < 25: return False
+        if CHEER.search(t) and len(core) < 60: return False
+        return True
+    exp = defaultdict(lambda: defaultdict(list)); qa = defaultdict(lambda: defaultdict(list))
+    ne = nq = 0
+    for p in pages:
+        y = year_of(p["dt"]); body = p.get("body", "")
+        txt = p["title"] + " " + body[:400]
+        names = sorted({n for n, r in SCH if r.search(txt)}) or ["학교미상"]
+        good = [c for c in p.get("comments", []) if meaningful(c)]
+        is_q = bool(QTITLE.search(p["title"])) or body.rstrip().endswith("?")
+        full = p["title"] + " " + body
+        if len(JEONG.findall(full)) >= 2 and not SUSI.search(full): continue  # 본문까지 보면 정시 이야기인 글
+        head2 = p["title"] + " " + body[:500]
+        exp_ok = (not is_q and EXPW.search(head2) and FIRST.search(head2) and CHUHAP.search(head2)
+                  and not NOEXP.search(p["title"]) and len(JEONG.findall(head2)) < 2 and len(body) >= 10)
+        if exp_ok:
+            ne += 1
+            for n in names: exp[n][y].append((p, good))
+        elif good:
+            nq += 1
+            for n in names: qa[n][y].append((p, good))
+    def block(p, good, kind):
+        b = p.get("body", "")
+        b = b[:600] + ("…" if len(b) > 600 else "")
+        s = f"### {p['dt'][:16]} · [{p['title'] or '(제목 없음)'}]({p['url']})" + NL + NL + ("> " + b if b else "> (본문 없음)") + NL
+        if good:
+            s += NL + ("의미 있는 댓글:" if kind == "exp" else "답변(짧은 응원·한 줄 답은 뺌):") + NL
+            for c in good[:8]:
+                t = c["text"][:400] + ("…" if len(c["text"]) > 400 else "")
+                s += ("  - ↳ " if c["reply"] else "- ") + t + NL
+        return s
+    head = {"exp": ("경험담", "추가합격을 직접 겪은 이야기(받은 때·예비번호가 움직인 과정·합격 뒤 이야기 등)로 보이는 글. 제목이 질문이 아닌 글 중 겪은 일을 나타내는 말이 든 것을 자동으로 고름"),
+            "qa": ("질문과답변", "질문 글 가운데 길고 내용 있는 댓글(25자 이상, 짧은 응원·한 줄 답 제외)이 달린 것만 모음. 댓글은 개인 의견이라 틀릴 수 있음")}
+    cnt = Counter()
+    for kind, data in (("exp", exp), ("qa", qa)):
+        title, desc = head[kind]
+        for n, ys in data.items():
+            d = os.path.join(OUT, rel(n)); os.makedirs(d, exist_ok=True)
+            with open(os.path.join(d, f"{title}.md"), "w", encoding="utf-8") as f:
+                f.write(f"# {n} · 수시 추가합격 {title}" + NL + NL)
+                f.write(f"- {desc}" + NL)
+                f.write("- 출처: 오르비(orbi.kr). 본문은 앞 600자, 댓글은 400자까지. 작성자 닉네임은 저장하지 않음. 블로그에 문장을 옮기지 않고 흐름·유형 참고용으로만 씀" + NL)
+                for y in sorted(ys):
+                    f.write(NL + f"## {y}학년도 ({len(ys[y])}편)" + NL + NL)
+                    f.write(NL.join(block(p, g, kind) for p, g in sorted(ys[y], key=lambda x: x[0]["dt"])))
+                cnt[(kind, n)] = sum(len(v) for v in ys.values())
+    with open(os.path.join(OUT, "학교목록.md"), "a", encoding="utf-8") as f:
+        f.write(NL + "## 경험담·질문과답변 파일" + NL + NL + f"- 본문·댓글을 받은 글 {len(pages)}편 중 경험담 {ne}편, 의미 있는 답변이 달린 질문 {nq}편" + NL + NL)
+        f.write("| 학교 | 경험담 | 질문과답변 |" + NL + "|---|---|---|" + NL)
+        for n in order:
+            e, q = cnt[("exp", n)], cnt[("qa", n)]
+            if not (e or q): continue
+            ce = f"[{e}]({rel(n)}/경험담.md)" if e else "-"; cq = f"[{q}]({rel(n)}/질문과답변.md)" if q else "-"
+            f.write(f"| {n} | {ce} | {cq} |" + NL)
+    print("경험담", ne, "질문과답변", nq)
