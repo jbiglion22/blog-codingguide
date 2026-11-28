@@ -122,7 +122,7 @@ def thermo():
     W, H = 1080, 1000
     im = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(im)
     kicker(d, 60, 48)
-    ctext(d, W / 2, 118, "실제 기온보다 따뜻한 날처럼 입기", F(52), INK)
+    ctext(d, W / 2, 118, "실제 기온보다 조금 따뜻한 날처럼 입기", F(50), INK)
     def therm(cx, level, col, lab1, lab2, temp):
         d.rounded_rectangle((cx - 40, 250, cx + 40, 700), 40, fill="white", outline="#d9d0c6", width=5)
         d.ellipse((cx - 70, 650, cx + 70, 790), fill=col)
@@ -132,7 +132,7 @@ def thermo():
         ctext(d, cx, 880, lab2, F(38, "Medium"), GRAY)
         d.text((cx + 70, top - 30), temp, font=F(56, "ExtraBold"), fill=col)
     therm(300, .32, SKY, "실제 기온", "예: 0℃ 아침", "0℃")
-    therm(760, .55, COR, "옷은 이 날씨처럼", "약 8~11℃ 날의 옷", "8~11℃")
+    therm(760, .55, COR, "옷차림 참고", "예: 8~11℃ 날의 옷", "8~11℃")
     # 화살표
     d.line((420, 470, 620, 470), fill=GRAY, width=8)
     d.polygon(((620, 448), (660, 470), (620, 492)), fill=GRAY)
